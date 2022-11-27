@@ -11,17 +11,6 @@ module.exports = {
         if (!firstName || (typeof firstName != "string")) throw "must give first name as a string";
         if (!lastName || (typeof lastName != "string")) throw "must give last name as a string";
         if (!email || (typeof email != "string")) throw "must give email as a string";
-        // if (!profilePicture || (typeof profilePicture != "string")) throw "must give profilePicture as a string";
-        if (city == "" || !city){
-            city = ""
-        } else {
-            if (typeof city != "string") {
-                throw "must give city as a string";
-            }
-        }
-
-        if (!state || (typeof state != "string")) throw "must give state as a string";
-        if (!age || (typeof age != "string")) throw "must give age as a string";
         if (!hashedPassword || (typeof hashedPassword != "string")) throw "must give hashed password as a string";
         const userCollection = await students();
         var emailLowerCase = email.toLowerCase();
@@ -29,10 +18,6 @@ module.exports = {
             firstName: firstName,
             lastName: lastName,
             email: emailLowerCase,
-            profilePicture: profilePicture,
-            city: city,
-            state: state,
-            age: age,
             hashedPassword: hashedPassword,
             reviewIds: [],
             commentIds: []
@@ -102,18 +87,6 @@ module.exports = {
         }
         if (updatedStudents.email) {
             updatedStudentsData.email = updatedStudents.email;
-        }
-        if (updatedStudents.profilePicture) {
-            updatedStudentsData.profilePicture = updatedStudents.profilePicture;
-        }
-        if (updatedStudents.city) {
-            updatedStudentsData.city = updatedStudents.city;
-        }
-        if (updatedStudents.state) {
-            updatedStudentsData.state = updatedStudents.state;
-        }
-        if (updatedStudents.age) {
-            updatedStudentsData.age = updatedStudents.age;
         }
         if (updatedStudents.hashedPassword) {
             updatedStudentsData.hashedPassword = updatedStudents.hashedPassword;
