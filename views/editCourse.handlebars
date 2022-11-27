@@ -1,0 +1,16 @@
+<div class="card-center">
+    <h3>Edit course</h3>
+    <form method="POST" action="/courses/edit/">
+        <input type="text" name="_id" placeholder="course ID" value="{{course._id}}" class="inputFields" readonly />
+        <input type="text" name="name" placeholder="course Name" value="{{course.name}}" class="inputFields" />
+        <input type="text" name="website" placeholder="course Website" value="{{course.website}}" class="inputFields" />
+        <input type="text" name="category" placeholder="course Category" value="{{course.category}}" class="inputFields" />
+        <input type="text" name="address" placeholder="course Address" value="{{course.address}}" class="inputFields" />
+        <input type="text" name="city" placeholder="course City" value="{{course.city}}" class="inputFields" />
+        <input type="text" name="state" placeholder="course State" value="{{course.state}}" class="inputFields" />
+        <input type="text" name="zip" placeholder="course Zip Code" value="{{course.zip}}" class="inputFields" />
+        <input type="text" name="longitude" placeholder="course Longitude" value="{{course.longitude}}" class="inputFields" />
+        <input type="text" name="latitude" placeholder="course Latitude" value="{{course.latitude}}" class="inputFields" />
+        <input type="submit" value="Edit course" class="btn" />
+    </form>
+</div>

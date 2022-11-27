@@ -1,0 +1,13 @@
+<main>
+    <!-- We should consider having review titles, otherwise rating will be header -->
+    <div class="card-full">
+        <h1><a href="../courses/{{course._id}}">{{course.name}}</a></h1>
+        <p>{{user.firstName}} {{user.lastName}}</p>
+        <p>Rating: {{review.rating}}/5</p>
+        <img src="/reviews/reviewPic/{{review._id}}" onerror="this.style.display='none'" alt="Review Picture" class="reviewImgIcon">
+        <p>{{review.reviewText}}</p>
+        {{#if isReviewer}}
+            <p><a href="/reviews/{{id}}/edit">Edit Review</a></p>
+        {{/if}}
+    </div>
+</main>
