@@ -9,7 +9,7 @@ const courses = data.courses;
 const reviews = data.reviews;
 const bcrypt = require("bcryptjs");
 const reviewData = mongoCollections.reviews;
-const userData = mongoCollections.students;
+const studentData = mongoCollections.students;
 const xss = require('xss');
 
 const multer = require('multer');
@@ -31,13 +31,13 @@ var upload = multer({ storage: storage })
 router.post('/upload/profilepic', upload.single('picture'), async (req, res) => {
   var img = fs.readFileSync(req.file.path);
   var encode_image = img.toString('base64');
-  let userId = req.session.AuthCookie;
+  let studentId = req.session.AuthCookie;
   var finalImg = {
       contentType: req.file.mimetype,
       image: Buffer.from(encode_image, 'base64')
   };
 
-  const addingProfilePicture = await students.addStudentsProfilePicture(userId, finalImg);
+  const addingProfilePicture = await students.addStudentsProfilePicture(studentId, finalImg);
   res.redirect("/students/profile");
 });
 
@@ -57,8 +57,8 @@ router.get('/profilepic/:id', async (req, res) => {
 router.get("/login", (req, res) => {
   let hasErrors = false;
   let errors = [];
-  let userId = req.session.AuthCookie;
-  if(!userId) {
+  let studentId = req.session.AuthCookie;
+  if(!studentId) {
     auth = "Not Authorised Students"
     errors.push("Not Authorised, Please Login");
     res.render("login");
@@ -84,11 +84,11 @@ router.get("/profile", async (req, res) => {
       res.status(403).render("login", {hasErrors:hasErrors, errors: errors});
     } else {
       auth = "Authorised Students"
-      let userId = req.session.AuthCookie;
-      let userData = await students.getStudents(userId);
+      let studentId = req.session.AuthCookie;
+      let studentData = await students.getStudents(studentId);
       let reviewObject = [];
-      for (i=0; i<userData.reviewIds.length; i++) {
-        let curReview = await reviews.getReview(userData.reviewIds[i]);
+      for (i=0; i<studentData.reviewIds.length; i++) {
+        let curReview = await reviews.getReview(studentData.reviewIds[i]);
         let curcourse = await courses.getcourse(curReview.courseId);
         let reviewInfo = {
           review: curReview,
@@ -97,13 +97,13 @@ router.get("/profile", async (req, res) => {
         reviewObject.push(reviewInfo);
       }
       return res.status(307).render('profile', { 
-        id: userId,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        email: userData.email,
-        city: userData.city,
-        state: userData.state,
-        age: userData.age,
+        id: studentId,
+        firstName: studentData.firstName,
+        lastName: studentData.lastName,
+        email: studentData.email,
+        city: studentData.city,
+        state: studentData.state,
+        age: studentData.age,
         reviews: reviewObject,
         userLoggedIn: true});
     }
@@ -137,10 +137,10 @@ router.get("/:id", async (req, res) => {
     return res.redirect("/students/profile");
   }
     try {
-      let userData = await students.getStudents(req.params.id);
+      let studentData = await students.getStudents(req.params.id);
       let reviewObject = [];
-      for (i=0; i<userData.reviewIds.length; i++) {
-        let curReview = await reviews.getReview(userData.reviewIds[i]);
+      for (i=0; i<studentData.reviewIds.length; i++) {
+        let curReview = await reviews.getReview(studentData.reviewIds[i]);
         let curcourse = await courses.getcourse(curReview.courseId);
         let reviewInfo = {
           review: curReview,
@@ -149,11 +149,11 @@ router.get("/:id", async (req, res) => {
         reviewObject.push(reviewInfo);
       }
       res.status(200).render("user", { 
-        id: userData._id,
-        firstName: userData.firstName, 
-        lastName: userData.lastName, 
-        profilePicture: userData.profilePicture, 
-        state: userData.state,
+        id: studentData._id,
+        firstName: studentData.firstName, 
+        lastName: studentData.lastName, 
+        profilePicture: studentData.profilePicture, 
+        state: studentData.state,
         reviews: reviewObject,
         userLoggedIn: userLoggedIn});
     } catch (e) {
@@ -234,12 +234,12 @@ router.post("/myprofile", async (req, res) => {
   router.post("/login", async (req, res) => {
     let hasErrors = false;
     let errors = [];
-    let userId = req.session.AuthCookie;
-    if(userId) {
+    let studentId = req.session.AuthCookie;
+    if(studentId) {
       auth = "Authorised Students"
       return res.redirect("/students/profile");
     } else {
-      	const userCollection = await userData();
+      	const userCollection = await studentData();
       	let userName = (req.body.username).toLowerCase();
       	let password = req.body.password;
       
@@ -261,8 +261,8 @@ router.post("/myprofile", async (req, res) => {
             return res.render("login", {hasErrors:hasErrors, errors: errors});
           } else {
             auth = "Authorised Students"
-            let userId = await students.getStudentsId(userName);
-            req.session.AuthCookie = userId;
+            let studentId = await students.getStudentsId(userName);
+            req.session.AuthCookie = studentId;
             req.session.user = user;
             return res.redirect("/students/profile");
           }
@@ -283,7 +283,7 @@ router.post("/signup", async (req, res) => {
   let city = req.body.city;
   let state = req.body.state;
   
-  const userCollection = await userData();      
+  const userCollection = await studentData();      
   const user = await userCollection.findOne({ email: userName});
   if (user) {
     hasErrors = true;

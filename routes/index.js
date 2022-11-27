@@ -11,8 +11,8 @@ const constructorMethod = app => {
   
   app.get("/", (req, res) => {
     let userLoggedIn = false;
-    let userId = req.session.AuthCookie;
-    if(!userId) {
+    let studentId = req.session.AuthCookie;
+    if(!studentId) {
       userLoggedIn = false;
     } else {
       userLoggedIn = true;

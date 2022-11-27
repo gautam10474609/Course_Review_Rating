@@ -2,35 +2,30 @@ const { ObjectId } = require('mongodb');
 
 const mongoCollections = require("../config/mongoCollections");
 const courses = mongoCollections.courses;
-// const uuid = require('uuid/v4');
 
 module.exports = {
-    async addCourse(name, website, category, address, city, state, zip, latitude, longitude) {
-        if (!name || (typeof name != "string")) throw "must give name as a string";
-        if (!website || (typeof website != "string")) throw "must give website as a string";
-        if (!category || (typeof category != "string")) throw "must give category as a string";
-        if (!address || (typeof address != "string")) throw "must give address as a string";
-        if (!city || (typeof city != "string")) throw "must give city as a string";
-        if (!state || (typeof state != "string")) throw "must give state as a string";
-        if (!zip || (typeof zip != "string")) throw "must give zip as a string";
-        if (!longitude || (typeof longitude != "number")) throw "must give longitude as a number";
-        if (!latitude || (typeof latitude != "number")) throw "must give latitude as a number";
+    async addCourse(name, courseId, professorname, taname, credits, professoremail, taemail) {
+        if (!name || (typeof name != "string")) throw "Name should be string";
+        if (!courseId || (typeof courseId != "string")) throw "Name should be string";
+        if (!professorname || (typeof professorname != "string")) throw "Professor Name should be string";
+        if (!taname || (typeof taname != "string")) throw "TA Name should be string";
+        if (!credits || (typeof credits != "number")) throw "Credits should be number";
+        if (!professoremail || (typeof professoremail != "string")) throw "Professor email should be string";
+        if (!taemail || (typeof taemail != "string")) throw "TA email should be string";
         const courseCollection = await courses();
         let newCourse = {
             name: name,
-            website: website,
-            category: category,
-            address: address,
-            city: city,
-            state: state,
-            zip: zip,
-            longitude: longitude,
-            latitude: latitude,            
-            owner: "",
+            courseId: courseId,
+            professorname: professorname,
+            taname: taname,
+            credits: credits,
+            professoremail: professoremail,
+            taemail: taemail,           
+            admin: "",
             rating: 0,
             reviews: [],
         }
-        const insertInfo = await courseCollection.insertOne(newCourses);
+        const insertInfo = await courseCollection.insertOne(newCourse);
         if (insertInfo.insertedCount === 0) throw "could not add courses";
         const newId = insertInfo.insertedId;
         const newIDString = String(newId);
@@ -38,29 +33,25 @@ module.exports = {
         return course;
     },
 
-    async addCourseWithAdmin(name, website, category, address, city, state, zip, latitude, longitude, owner) {
-        if (!name || (typeof(name) !== "string")) throw "Error (addCourseWithAdmin): Name must be included as a string.";
-        if (!website || (typeof(website) !== "string")) throw "Error (addCourseWithAdmin): Website must be included as a string.";
-        if (!category || (typeof(category) !== "string")) throw "Error (addCourseWithAdmin): Category must be included as a string.";
-        if (!address || (typeof(address) !== "string")) throw "Error (addCourseWithAdmin): Address must be included as a string.";
-        if (!city || (typeof(city) !== "string")) throw "Error (addCourseWithAdmin): City must be included as a string.";
-        if (!state || (typeof(state) !== "string")) throw "Error (addCourseWithAdmin): State must be included as a string.";
-        if (!zip || (typeof(zip) !== "string")) throw "Error (addCourseWithAdmin): Zip must be included as a string.";
-        if (!longitude || (typeof(longitude) !== "number")) throw "Error (addCourseWithAdmin): Longitude must be included as a float.";
-        if (!latitude || (typeof(latitude) !== "number")) throw "Error (addCourseWithAdmin): Latitude must be included as a float.";
-        if (!owner) throw "Error (addCourseWithAdmin): Owner ID must be included.";
-        if (typeof(owner) === "string") owner = ObjectId.createFromHexString(owner);
+    async addCourseWithAdmin(name, courseId, professorname, taname, credits, professoremail, taemail, admin) {
+        if (!name || (typeof(name) !== "string")) throw "Error (addCourseWithAdmin): Name should be string.";
+        if (!courseId || (typeof(courseId) !== "string")) throw "Error (addCourseWithAdmin): courseId suould be string.";
+        if (!professorname || (typeof(professorname) !== "string")) throw "Error (addCourseWithAdmin): Professor name should be string.";
+        if (!taname || (typeof(taname) !== "string")) throw "Error (addCourseWithAdmin): TA Name should be string.";
+        if (!credits || (typeof(credits) !== "number")) throw "Error (addCourseWithAdmin): Credits shoulbe be string.";
+        if (!professoremail || (typeof(professoremail) !== "string")) throw "Error (addCourseWithAdmin): Professor email ahould be string.";
+        if (!taemail || (typeof(taemail) !== "string")) throw "Error (addCourseWithAdmin): TA email should be string.";
+        if (!admin) throw "Error (addCourseWithAdmin): Admin ID must be included.";
+        if (typeof(admin) === "string") admin = ObjectId.createFromHexString(admin);
         const courseCollection = await courses();
         let newCourse = {
             name: name,
-            website: website,
-            category: category,
-            address: address,
-            city: city,
-            state: state,
-            zip: zip,
-            longitude: longitude,
-            latitude: latitude,
+            courseId: courseId,
+            professorname: professorname,
+            taname: taname,
+            credits: credits,
+            professoremail: professoremail,
+            taemail: taemail,
             owner: owner,
             rating: 0,
             reviews: [],
@@ -72,29 +63,25 @@ module.exports = {
         return course;
     },
 
-    async updateCourse(id, name, website, category, address, city, state, zip, latitude, longitude) {
+    async updateCourse(id, name, courseId, professorname, taname, credits, professoremail, taemail) {
         if (!id) throw "Error (updateCourse): Course ID must be included.";
         if (typeof(id) === "string") id = ObjectId.createFromHexString(id);
-        if (!name || (typeof(name) !== "string")) throw "Error (updateCourse): Name must be included as a string.";
-        if (!website || (typeof(website) !== "string")) throw "Error (updateCourse): Website must be included as a string.";
-        if (!category || (typeof(category) !== "string")) throw "Error (updateCourse): Category must be included as a string.";
-        if (!address || (typeof(address) !== "string")) throw "Error (updateCourse): Address must be included as a string.";
-        if (!city || (typeof(city) !== "string")) throw "Error (updateCourse): City must be included as a string.";
-        if (!state || (typeof(state) !== "string")) throw "Error (updateCourse): State must be included as a string.";
-        if (!zip || (typeof(zip) !== "string")) throw "Error (updateCourse): Zip must be included as a string.";
-        if (!longitude || (typeof(longitude) !== "number")) throw "Error (updateCourse): Longitude must be included as a float.";
-        if (!latitude || (typeof(latitude) !== "number")) throw "Error (updateCourse): Latitude must be included as a float.";
+        if (!name || (typeof(name) !== "string")) throw "Error (updateCourse): Name should be string.";
+        if (!courseId || (typeof(courseId) !== "string")) throw "Error (updateCourse): courseId should be string.";
+        if (!professorname || (typeof(professorname) !== "string")) throw "Error (updateCourse): Professor name should be string.";
+        if (!taname || (typeof(taname) !== "string")) throw "Error (updateCourse): TA Name should be string.";
+        if (!credits || (typeof(credits) !== "number")) throw "Error (updateCourse): Credits shoulbe be string.";
+        if (!professoremail || (typeof(professoremail) !== "string")) throw "Error (updateCourse): Professor email ahould be string.";
+        if (!taemail || (typeof(taemail) !== "string")) throw "Error (updateCourse): TA email should be string.";
         const courseCollection = await courses();
         let updatedCourse = {
             name: name,
-            website: website,
-            category: category,
-            address: address,
-            city: city,
-            state: state,
-            zip: zip,
-            longitude: longitude,
-            latitude: latitude
+            courseId: courseId,
+            professorname: professorname,
+            taname: taname,
+            credits: credits,
+            professoremail: professoremail,
+            taemail: taemail
         }
         const updateInfo = await courseCollection.updateOne({ _id: id }, {$set: updatedCourse});
         if (updateInfo.modifiedCount === 0) throw "Error (updatedCourse): Failed to update course in DB.";
@@ -135,15 +122,15 @@ module.exports = {
         return courseList;
     },
     
-    async checkcourseOwnership(courseId, userId) {
-        if (!userId) throw "Error (checkcourseOwnership): Must provide ID of user to check.";
+    async checkcourseOwnership(courseId, studentId) {
+        if (!studentId) throw "Error (checkcourseOwnership): Must provide ID of user to check.";
         if (!courseId) throw "Error (checkcourseOwnership): Must provide ID of course to check.";
-        if (typeof(userId) === "string") userId = ObjectId.createFromHexString(userId);
+        if (typeof(studentId) === "string") studentId = ObjectId.createFromHexString(studentId);
         if (typeof(courseId) === "string") courseId = ObjectId.createFromHexString(courseId);
         const courseCollection = await courses();
-        const courseList = await courseCollection.find({ owner: userId }).toArray();
-        for (course of courseList) {
-            if (courseId === course._id) {
+        const courseList = await courseCollection.find({ owner: studentId }).toArray();
+        for (let cs of courseList) {
+            if (courseId === cs._id) {
                 return true; // Break, course is in user's owned list
             }
         }

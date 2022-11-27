@@ -8,13 +8,13 @@ const students = mongoCollections.students;
 
 module.exports = {
     // I think it makes sense to also add the review id that the comment is being written on
-    async addComment(userId, reviewId, commentText) {
-        if (!userId || (typeof userId != "string")) throw "userId must be given as a string";
+    async addComment(studentId, reviewId, commentText) {
+        if (!studentId || (typeof studentId != "string")) throw "studentId must be given as a string";
         if (!reviewId || (typeof reviewId != "string")) throw "reviewId must be given as a string";
         if (!commentText || (typeof commentText != "string")) throw "must give comment text as a string";
         const commentCollection = await comments();
         let newComment = {
-            userId: userId,
+            studentId: studentId,
             reviewId: reviewId,
             commentText: commentText
         }
@@ -23,7 +23,7 @@ module.exports = {
         const revCollection = await reviews();
         const studentsCollection = await students();
         const objIdForRev = ObjectId.createFromHexString(reviewId);
-        const objIdForStudents = ObjectId.createFromHexString(userId);
+        const objIdForStudents = ObjectId.createFromHexString(studentId);
         
         if (insertInfo.insertedCount === 0) {
             throw 'Could not add new Review';

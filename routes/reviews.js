@@ -28,10 +28,10 @@ router.get("/:id", async (req, res) => {
   let isReviewer = false;
     try {
       const review = await reviews.getReview(req.params.id);
-      const user = await students.getStudents(review.userId);
+      const user = await students.getStudents(review.studentId);
       const course = await courses.getcourse(review.courseId);
       // if the reviewer is on the page, give them a button to edit
-      if(req.session.AuthCookie === review.userId) {
+      if(req.session.AuthCookie === review.studentId) {
         isReviewer = true;
       }
       res.status(200).render("review", { review: review, user: user, course: course, isReviewer: isReviewer, id: req.params.id });
@@ -51,7 +51,7 @@ router.post("/:id/add", upload.single('picture'), async (req, res) => {
     error.push("Rating must be a number between 1 and 5");
     let course = await courses.getcourse(req.params.id);
       let reviewList = [];
-      let userData = {}
+      let studentData = {}
       let userLoggedIn = false;
       let loggedInReviewer = false;
       let sumRating = 0;
@@ -76,7 +76,7 @@ router.post("/:id/add", upload.single('picture'), async (req, res) => {
           try { // Get comments of review
             for (commentId of review.comments) {
               comment = await comments.getComment(commentId);
-              comment.user = await students.getStudents(comment.userId);
+              comment.user = await students.getStudents(comment.studentId);
               commentList.push(comment); // This is a simple FIFO - can be improved or filtered in client JS
             }
           } catch (e) {
@@ -84,14 +84,14 @@ router.post("/:id/add", upload.single('picture'), async (req, res) => {
           }
           review.commentList = commentList; // Add new array inside review object
           // If this review is by the logged in user, let them edit it from here
-          if (req.session.AuthCookie === review.userId) {
+          if (req.session.AuthCookie === review.studentId) {
             review.isReviewer = true;
             loggedInReviewer = true;
           } else {
             review.isReviewer = false;
             loggedInReviewer = false;
           }
-          review.user = await students.getStudents(review.userId);
+          review.user = await students.getStudents(review.studentId);
           reviewList.push(review); // This is a simple FIFO - can be improved or filtered in client JS
 
         }
@@ -99,15 +99,15 @@ router.post("/:id/add", upload.single('picture'), async (req, res) => {
         console.log(e);
       }
 
-      let userId = req.session.AuthCookie;
-      if(!userId) {
+      let studentId = req.session.AuthCookie;
+      if(!studentId) {
         userLoggedIn = false;
       } else {
         userLoggedIn = true;
-        userData = await students.getStudents(userId);
-        userData.reviewedcoursePage = reviewList.some(item => item.userId === String(userData._id));
+        studentData = await students.getStudents(studentId);
+        studentData.reviewedcoursePage = reviewList.some(item => item.studentId === String(studentData._id));
       }
-    return res.status(403).render("course", { course: course, reviews: reviewList, userLoggedIn: userLoggedIn, loggedInReviewer: loggedInReviewer, currentStudentsData: userData, hasError: hasError, error: error});
+    return res.status(403).render("course", { course: course, reviews: reviewList, userLoggedIn: userLoggedIn, loggedInReviewer: loggedInReviewer, currentStudentsData: studentData, hasError: hasError, error: error});
   }
   try {
     const reviewRating = req.body.rating;
@@ -125,9 +125,9 @@ router.post("/:id/add", upload.single('picture'), async (req, res) => {
       };
     }
     
-    let userId = req.session.AuthCookie;
+    let studentId = req.session.AuthCookie;
     let courseID = req.params.id;
-    const reviewForRes = await reviews.addReview(courseID, userId, reviewText, Number(reviewRating), finalImg);
+    const reviewForRes = await reviews.addReview(courseID, studentId, reviewText, Number(reviewRating), finalImg);
     console.log(reviewForRes);
     const redirectURL = "/courses/" + courseID;
     return res.redirect(redirectURL);
@@ -162,7 +162,7 @@ router.get("/", async (req, res) => {
 router.get("/:id/edit", async (req, res) => {
   try {
     const review = await reviews.getReview(req.params.id);
-    if (req.session.AuthCookie != review.userId) {
+    if (req.session.AuthCookie != review.studentId) {
       return res.redirect("/reviews");
     } else {
       res.status(200).render("editReview", {reviewId: req.params.id, reviewText: review.reviewText, rating: review.rating, userLoggedIn: true});
@@ -205,10 +205,10 @@ router.post("/:id/edit", upload.single('picture'), async (req, res) => {
     }
     console.log(editedReview);
     const review = await reviews.getReview(req.params.id);
-    const user = await students.getStudents(review.userId);
+    const user = await students.getStudents(review.studentId);
     const course = await courses.getcourse(review.courseId);
     const updatedReview = await reviews.updateReview(req.params.id, editedReview);
-    if(req.session.AuthCookie === review.userId) {
+    if(req.session.AuthCookie === review.studentId) {
       isReviewer = true;
     }
     return res.status(200).render("review", { review: updatedReview, user: user, course: course, isReviewer: isReviewer, id: req.params.id, userLoggedIn: true});

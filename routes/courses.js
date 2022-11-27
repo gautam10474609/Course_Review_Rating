@@ -38,9 +38,9 @@ router.get("/edit/:id", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
     try {
-      let course = await courses.getcourse(req.params.id);
+      let course = await courses.getCourse(req.params.id);
       let reviewList = [];
-      let userData = {}
+      let studentData = {}
       let userLoggedIn = false;
       let loggedInReviewer = false;
       let sumRating = 0;
@@ -48,9 +48,9 @@ router.get("/:id", async (req, res) => {
       let hasError = false;
       let error = [];
       try { // Get reviews of course
-        for (reviewId of course.reviews) {
-          review = await reviews.getReview(reviewId);
-          commentList = [];
+        for (let reviewId of course.reviews) {
+          let review = await reviews.getReview(reviewId);
+          let commentList = [];
           //Get Avg
           totalRating += 1;
           sumRating += parseInt(review.rating);
@@ -64,12 +64,12 @@ router.get("/:id", async (req, res) => {
           if(!updated.matchedCount && !updated.modifiedCount) res.status(500).json({ message: "Couldn't update rating" });
 
           try { // Get comments of review
-            for (commentId of review.comments) {
-              comment = await comments.getComment(commentId);
-              comment.user = await students.getStudents(comment.userId);
+            for (let commentId of review.comments) {
+              let comment = await comments.getComment(commentId);
+              comment.user = await students.getStudents(comment.studentId);
               comment.courseId = req.params.id;
               // If this comment is by the logged in user, let them edit it from here
-              if (req.session.AuthCookie === comment.userId) {
+              if (req.session.AuthCookie === comment.studentId) {
                 comment.isCommenter = true;
               } else {
                 comment.isCommenter = false;
@@ -81,14 +81,14 @@ router.get("/:id", async (req, res) => {
           }
           review.commentList = commentList; // Add new array inside review object
           // If this review is by the logged in user, let them edit it from here
-          if (req.session.AuthCookie === review.userId) {
+          if (req.session.AuthCookie === review.studentId) {
             review.isReviewer = true;
             loggedInReviewer = true;
           } else {
             review.isReviewer = false;
             loggedInReviewer = false;
           }
-          review.user = await students.getStudents(review.userId);
+          review.user = await students.getStudents(review.studentId);
           reviewList.push(review); // This is a simple FIFO - can be improved or filtered in client JS
 
         }
@@ -96,32 +96,33 @@ router.get("/:id", async (req, res) => {
         console.log(e);
       }
 
-      let userId = req.session.AuthCookie;
-      if(!userId) {
+      let studentId = req.session.AuthCookie;
+      if(!studentId) {
         userLoggedIn = false;
       } else {
         userLoggedIn = true;
-        userData = await students.getStudents(userId);
-        userData.reviewedcoursePage = reviewList.some(item => item.userId === String(userData._id));
+        studentData = await students.getStudents(studentId);
+        studentData.reviewedcoursePage = reviewList.some(item => item.studentId === String(studentData._id));
       }
       course = await courses.getcourse(req.params.id);
-      res.status(200).render("course", { course: course, reviews: reviewList, userLoggedIn: userLoggedIn, loggedInReviewer: loggedInReviewer, currentStudentsData: userData, hasError: hasError, error: error})
+      res.status(200).render("course", { course: course, reviews: reviewList, userLoggedIn: userLoggedIn, loggedInReviewer: loggedInReviewer, currentStudentsData: studentData, hasError: hasError, error: error})
     } catch (e) {
       res.status(404).json({ message: "course not found!" });
     }
 });
   
 router.get("/", async (req, res) => {
+  console.log("testA")
   let sumRating = 0;
   let totalRating = 0;
 
   try {
     let courseList = await courses.getAllcourses();
-    for (couro of courseList){
+    for (let couro of courseList){
       let sumRating = 0;
       let totalRating = 0;
-      for (reviewId of couro.reviews) {
-        review = await reviews.getReview(reviewId);
+      for (let reviewId of couro.reviews) {
+        let review = await reviews.getReview(reviewId);
         //Get Avg
         totalRating += 1;
         sumRating += parseInt(review.rating);
@@ -136,16 +137,16 @@ router.get("/", async (req, res) => {
     }
     
     let userLoggedIn = false;
-    let userId = req.session.AuthCookie;
+    let studentId = req.session.AuthCookie;
 
-    if(!userId) {
+    if(!studentId) {
       userLoggedIn = false;
     } else {
       userLoggedIn = true;
     }
     courseList = await courses.getAllcourses();
     let newcourseList = [];
-    for (course of courseList) {
+    for (let course of courseList) {
       if (course.reviews.length > 0) {
         course.rated = true;
       } else {
@@ -169,16 +170,14 @@ router.post("/add", async (req, res) => {
   } else {
     const body = req.body;
     if (!body.name) res.status(400).redirect("/courses/admin"); 
-    if (!body.website) res.status(400).redirect("/courses/admin");
-    if (!body.category) res.status(400).redirect("/courses/admin");
-    if (!body.address) res.status(400).redirect("/courses/admin");
-    if (!body.city) res.status(400).redirect("/courses/admin");
-    if (!body.state) res.status(400).redirect("/courses/admin");
-    if (!body.zip) res.status(400).redirect("/courses/admin");
-    if (!body.longitude) res.status(400).redirect("/courses/admin");
-    if (!body.latitude) res.status(400).redirect("/courses/admin");
+    if (!body.courseId) res.status(400).redirect("/courses/admin");
+    if (!body.professorname) res.status(400).redirect("/courses/admin");
+    if (!body.taname) res.status(400).redirect("/courses/admin");
+    if (!body.credits) res.status(400).redirect("/courses/admin");
+    if (!body.professoremail) res.status(400).redirect("/courses/admin");
+    if (!body.taemail) res.status(400).redirect("/courses/admin");
     try {
-      await courses.addcourseWithOwner(body.name, body.website, body.category, body.address, body.city, body.state, body.zip, parseFloat(body.longitude), parseFloat(body.latitude), req.session.AuthCookie);
+      await courses.addcourseWithOwner(body.name, body.courseId, body.professorname, body.taname, body.credits, body.professoremail, body.taemail, req.session.AuthCookie);
     } catch (e) {
       console.log(e);
     }
@@ -197,16 +196,14 @@ router.post("/edit", async (req, res) => {
     res.status(401).redirect("/courses/admin");
   } else {
     if (!body.name) res.status(400).redirect("/courses/admin"); 
-    if (!body.website) res.status(400).redirect("/courses/admin");
-    if (!body.category) res.status(400).redirect("/courses/admin");
-    if (!body.address) res.status(400).redirect("/courses/admin");
-    if (!body.city) res.status(400).redirect("/courses/admin");
-    if (!body.state) res.status(400).redirect("/courses/admin");
-    if (!body.zip) res.status(400).redirect("/courses/admin");
-    if (!body.longitude) res.status(400).redirect("/courses/admin");
-    if (!body.latitude) res.status(400).redirect("/courses/admin");
+    if (!body.courseId) res.status(400).redirect("/courses/admin");
+    if (!body.professorname) res.status(400).redirect("/courses/admin");
+    if (!body.taname) res.status(400).redirect("/courses/admin");
+    if (!body.credits) res.status(400).redirect("/courses/admin");
+    if (!body.professoremail) res.status(400).redirect("/courses/admin");
+    if (!body.taemail) res.status(400).redirect("/courses/admin");
     try {
-      await courses.updatecourse(body._id, body.name, body.website, body.category, body.address, body.city, body.state, body.zip, parseFloat(body.longitude), parseFloat(body.latitude));
+      await courses.updatecourse(body._id, body.name, body.courseId, body.professorname, body.taname, body.credits, body.professoremail, body.taemail);
     } catch (e) {
       console.log(e);
     }
@@ -218,7 +215,7 @@ router.post("/edit", async (req, res) => {
 router.post("/search", async (req, res) => {
   const body = req.body;
   try {
-    let courseList = await courses.getcoursesViaSearch(body.search);
+    let courseList = await courses.getCoursesViaSearch(body.search);
     let newcourseList = [];
     for (course of courseList) {
       if (course.reviews.length > 0) {
@@ -230,8 +227,8 @@ router.post("/search", async (req, res) => {
     }
 
     let userLoggedIn = false;
-    let userId = req.session.AuthCookie;
-    if(!userId) {
+    let studentId = req.session.AuthCookie;
+    if(!studentId) {
       userLoggedIn = false;
     } else {
       userLoggedIn = true;

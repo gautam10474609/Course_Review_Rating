@@ -7,7 +7,7 @@ const comments = mongoCollections.comments;
 // const uuid = require('uuid/v4');
 
 module.exports = {
-    async addStudents(firstName, lastName, email, profilePicture, city, state, age, hashedPassword) {
+    async addStudents(firstName, lastName, email, hashedPassword) {
         if (!firstName || (typeof firstName != "string")) throw "must give first name as a string";
         if (!lastName || (typeof lastName != "string")) throw "must give last name as a string";
         if (!email || (typeof email != "string")) throw "must give email as a string";
@@ -77,8 +77,8 @@ module.exports = {
     async getStudentsId(username) {    
         if (!username) throw "username must be given";
         const userCollection = await students();
-        const userData = await userCollection.findOne({ email: username});
-        return userData._id;
+        const studentData = await userCollection.findOne({ email: username});
+        return studentData._id;
     },
 
     async updateStudents(id, updatedStudents) {

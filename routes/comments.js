@@ -22,14 +22,14 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.post('/:userId/:reviewId/:courseId/add', async (req, res) => {
-    if (!req.params.reviewId || !req.params.userId) {
+router.post('/:studentId/:reviewId/:courseId/add', async (req, res) => {
+    if (!req.params.reviewId || !req.params.studentId) {
       res.status(400).json({ error: 'You must Supply an ID to add comment to!' });
       return;
 	}
 	const commentVal = req.body.commentValue;
     try {
-      addCommentOnReview = await comments.addComment(req.params.userId, req.params.reviewId, commentVal)
+      addCommentOnReview = await comments.addComment(req.params.studentId, req.params.reviewId, commentVal)
       if(addCommentOnReview){
         return res.redirect("/courses/" + req.params.courseId);
       } else {

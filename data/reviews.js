@@ -9,9 +9,9 @@ const commentFunctions = require("./comments")
 // const uuid = require('uuid/v4');
 
 module.exports = {
-    async addReview(courseId, userId, reviewText, rating, reviewPicture) {
+    async addReview(courseId, studentId, reviewText, rating, reviewPicture) {
         if (!courseId || (typeof courseId != "string")) throw "course ID must be given as a string";
-        if (!userId || (typeof userId != "string")) throw "user ID must be given as a string";
+        if (!studentId || (typeof studentId != "string")) throw "user ID must be given as a string";
         if (!reviewText || (typeof reviewText != "string")) throw "review text must be given as a string";
         if (!rating || (typeof rating != "number") || (rating < 1) || (rating > 5)) throw "rating must be given as a number from 1 to 5";
         if (!reviewPicture || reviewPicture == "") {
@@ -22,7 +22,7 @@ module.exports = {
         const reviewCollection = await reviews();
         let newReview = {
             courseId: courseId,
-            userId: userId,
+            studentId: studentId,
             reviewText: reviewText,
             rating: rating,
             comments: [],
@@ -32,7 +32,7 @@ module.exports = {
             $and: [{
                 courseId: courseId
             }, {
-                userId: userId
+                studentId: studentId
             }]
         });
         if (alreadyReviewed) throw "This user already reviewed this course";
@@ -42,7 +42,7 @@ module.exports = {
         const resCollection = await courses();
         const studentsCollection = await students();
         const objIdForRes = ObjectId.createFromHexString(courseId);
-        const objIdForStudents = ObjectId.createFromHexString(userId);
+        const objIdForStudents = ObjectId.createFromHexString(studentId);
 
         // const insertInfo = await commentCollection.insertOne(newAlbum);
         
@@ -132,7 +132,7 @@ module.exports = {
             try {
                 const userCollection = await students();
                 const { ObjectId } = require('mongodb');
-                const objStudentsId = ObjectId.createFromHexString(reviewSearch.userId);
+                const objStudentsId = ObjectId.createFromHexString(reviewSearch.studentId);
                 const deletionInfoForReviewFromStudentss = await userCollection.updateOne({ _id: objStudentsId }, { $pull: { reviewIds: String(id) } });
                 
                 if (deletionInfoForReviewFromStudentss.deletedCount === 0) {
