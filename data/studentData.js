@@ -6,9 +6,9 @@ async function getStudentsData(id) {
     return studentData;
 }
 
-async function getStudentsId(username) {    
+async function getStudentsId(email) {    
     let studentData = {};
-    studentData = studentDataModule.students.find(user => user.username === username)
+    studentData = studentDataModule.students.find(user => user.email === email)
     return studentData._id;
 }
 

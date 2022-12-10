@@ -1,24 +1,23 @@
 <main>
-    <div class="card-wide" id ="sticky">
-        <h1>{{firstName}} {{lastName}} </h1>
-        <p>{{email}}</p>
-    </div>
-    
-    <div class="card-wide" id="right">
-        <h2>Edit Profile</h2>
-        <form id="edit-profile" action="/students/myprofile" method="post">
-            <label for="firstName">
-                <input type="text" id="firstName" name="firstName" class="inputFields" placeholder="First Name" value="{{firstName}}">
-            </label>
-            <label for="lastName">
-                <input type="text" id="lastName" name="lastName" class="inputFields" placeholder="Last Name" value="{{lastName}}">
-            </label>
-            <label for="email">
-                <input type="text" id="email" name="email" class="inputFields" placeholder="Email" value="{{email}}">
-            </label>
-             <label for="password">
-                <input type="password" id="password" name="password" class="inputFields" placeholder="New Password" minlength="8" class = "inputFields" onblur="passwordOnBlur(this)" onfocus="passwordOnFocus(this)" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters">
-            </label>
+<div class="loginPage" id="register-details">
+        <h2>please register with your college email</h2>
+        <form class = "registerForm"  id="register-form" name ="RegisterForm" action="/students/register" method="POST">
+            <div class="group">
+                <input type="text" class = "registerInput" name="firstname" id="firstname" placeholder="Enter your First Name" required/>  
+            <span id="firstnameError" class="error"></span>
+            </div>
+            <div class="group">
+                <input type="text" class = "registerInput" name="lastname" id="lastname" placeholder="Enter your Last Name" required/>
+             <span id="lastnameError" class="error"></span>
+            </div>
+            <div class="group">
+                <input type="text" class = "registerInput" name="email" id="email" placeholder="Enter your Email" required/>  
+             <span id="emailError" class="error"></span>
+            </div>
+           <div class="group">
+                <input type="password" class = "registerInput" id="password" name="password" minlength="8" onblur="passwordOnBlur(this)" onfocus="passwordOnFocus(this)" placeholder="Enter a Password(8 characters minimum)" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" required>
+            <span id="passwordError" class="error"></span>
+            </div>
             <div id="message">
                 <h3>Password must contain the following:</h3>
                 <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
@@ -26,26 +25,22 @@
                 <p id="number" class="invalid">A <b>number</b></p>
                 <p id="length" class="invalid">Minimum <b>8 characters</b></p>
             </div>
-            <label for="confirm">
-                <input type="password" id="confirm" name="confirm" class="inputFields" placeholder="Confirm Password">
-            </label>
-            <label>
-                <button type="submit" class = "btn">Confirm</button>
-            </label>
+            <br/>
+            <div class="group">
+                <button type="submit" class="btn">Register</button>
+             <span id="username-errmsg" class="error"></span>
+            </div>
         </form>
-
-        <div>
-            {{#if hasErrors}}
-                <ul class="error">
-                    {{#each errors}}
-                        <li>
-                            {{this}}
-                        </li>
-                    {{/each}}
-                </ul>
-            {{/if}}
-        </div>
+        {{#if error}}
+<p class="error">{{error}}</p>
+{{/if}}
     </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous">
+    </script>
     <script>
         function passwordOnBlur(x){
             document.getElementById("message").style.display = "none";
@@ -102,4 +97,5 @@
         }
         
     </script>
+    <script src="/public/javascript/register.js"></script>
 </main>

@@ -29,7 +29,7 @@ router.get("/:id", async (req, res) => {
     try {
       const review = await reviews.getReview(req.params.id);
       const user = await students.getStudents(review.studentId);
-      const course = await courses.getcourse(review.courseId);
+      const course = await courses.getCourse(review.courseId);
       // if the reviewer is on the page, give them a button to edit
       if(req.session.AuthCookie === review.studentId) {
         isReviewer = true;
@@ -49,7 +49,7 @@ router.post("/:id/add", upload.single('picture'), async (req, res) => {
   if (rating > 5 || rating < 1) {
     hasError = true;
     error.push("Rating must be a number between 1 and 5");
-    let course = await courses.getcourse(req.params.id);
+    let course = await courses.getCourse(req.params.id);
       let reviewList = [];
       let studentData = {}
       let userLoggedIn = false;
@@ -206,7 +206,7 @@ router.post("/:id/edit", upload.single('picture'), async (req, res) => {
     console.log(editedReview);
     const review = await reviews.getReview(req.params.id);
     const user = await students.getStudents(review.studentId);
-    const course = await courses.getcourse(review.courseId);
+    const course = await courses.getCourse(review.courseId);
     const updatedReview = await reviews.updateReview(req.params.id, editedReview);
     if(req.session.AuthCookie === review.studentId) {
       isReviewer = true;

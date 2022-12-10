@@ -9,7 +9,7 @@ In the terminal, navigate to the directory containing app.js, and run the follow
   Then, navigate to localhost:3000 to experience our site.   
 
   If you'd like to log in to an existing account, feel free to log using the following info:   
-  username/email: donald@stevens.edu
+  email: donald@stevens.edu
   password: anna  
   Or, make your own account on the login page.   
 

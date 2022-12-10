@@ -1,102 +1,107 @@
-const { ObjectId } = require('mongodb');
 const mongoCollections = require("../config/mongoCollections");
-
+const { ObjectId } = require("mongodb");
 const students = mongoCollections.students;
-const reviews = mongoCollections.reviews;
-const comments = mongoCollections.comments;
-// const uuid = require('uuid/v4');
+const bcrypt = require("bcryptjs");
+const validate = require('../serversideValidate');
+const saltRounds = 16;
 
 module.exports = {
-    async addStudents(firstName, lastName, email, hashedPassword) {
-        if (!firstName || (typeof firstName != "string")) throw "must give first name as a string";
-        if (!lastName || (typeof lastName != "string")) throw "must give last name as a string";
-        if (!email || (typeof email != "string")) throw "must give email as a string";
-        if (!hashedPassword || (typeof hashedPassword != "string")) throw "must give hashed password as a string";
-        const userCollection = await students();
-        var emailLowerCase = email.toLowerCase();
-        let newStudents = {
-            firstName: firstName,
-            lastName: lastName,
-            email: emailLowerCase,
-            hashedPassword: hashedPassword,
-            reviewIds: [],
-            commentIds: []
-        }
-
-        const userExists = await userCollection.findOne({ email: emailLowerCase});
-        if (userExists) throw "Email already in use";
-        const insertInfo = await userCollection.insertOne(newStudents);
-        if (insertInfo.insertedCount === 0) throw "could not add user";
-        return await this.getStudents(insertInfo.insertedId);
+    async addStudents(firstName, lastName, email, password) {
+         firstName = validate.validateFirstName(firstName);
+         lastName = validate.validateFirstName(lastName);
+         email = validate.validateEmail(email);
+         password = validate.validatePassword(password);
+        const studentCollection = await students();
+         email = email.toLowerCase();
+        const student = await studentCollection.findOne({ email: email });
+        const passwordHash = await bcrypt.hash(password, saltRounds);
+        if (!student) {
+            let newStudents = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                hashedPassword: passwordHash,
+                reviewIds: [],
+                commentIds: []
+            }
+            const insertInfo = await studentCollection.insertOne(newStudents);
+            if (insertInfo.insertedCount === 0) throw "could not add user";
+             return await this.getStudents(insertInfo.insertedId.toString());
+        } else
+            throw "Email is already registered.";
     },
 
-    async addStudentsProfilePicture(id, profilePicture) {
-        if (!id) throw "Students id is missing";
-        var objRevId = ""
-        if (typeof(id) === "string") objRevId = ObjectId.createFromHexString(id);
-        const userCollection = await students();
-        let updatedStudentsData = {};
-        let gotten = await this.getStudents(objRevId);
-        updatedStudentsData.profilePicture = profilePicture;
-        const updateInfoStudents = await userCollection.updateOne({ _id: objRevId }, { $set: updatedStudentsData });
-        if (updateInfoStudents.modifiedCount === 0 && updateInfoStudents.deletedCount === 0) throw "could not update user";
-        return await this.getStudents(id);
+    async getAllStudents() {
+        const studentCollection = await students();
+        const studentList = await studentCollection.find({}).toArray();
+        if (studentList.length === 0) throw "There are no students";
+        return studentList;
     },
 
     async getStudents(id) {
-        if (!id) throw "id must be given";
-        if (typeof(id) === "string") id = ObjectId.createFromHexString(id);
-        const userCollection = await students();
-        const user = await userCollection.findOne({ _id: id});
-        if (!user) throw "user with that id does not exist";
-        return user;
+         id = validate.validateId(id);
+         if (!ObjectId.isValid(id)) throw 'invalid object ID';
+         console.log(id);
+        const studentCollection = await students();
+        const student = await studentCollection.findOne({ _id: ObjectId(id) });
+        if (!student) throw "Student does not exists";
+       
+        return student;
     },
 
-    async getAllStudentss() {
-        const userCollection = await students();
-        const userList = await userCollection.find({}).toArray();
-        if (userList.length === 0) throw "no students in the collection";
-        return userList;
-    },
-
-    async getStudentsId(username) {    
-        if (!username) throw "username must be given";
-        const userCollection = await students();
-        const studentData = await userCollection.findOne({ email: username});
+    async getStudentsId(email) {
+         email = validate.validateId(email);
+        email = email.toLowerCase()
+        const studentCollection = await students();
+        const studentData = await studentCollection.findOne({ email: email });
         return studentData._id;
     },
 
     async updateStudents(id, updatedStudents) {
-        if (!id) throw "id is missing";
+         id = validate.validateId(id);
+         if (!ObjectId.isValid(id)) throw 'invalid object ID';
         if (!updatedStudents) {
             return await this.getStudents(id);
         }
-        if (typeof(id) === "string") id = ObjectId.createFromHexString(id);
-        const userCollection = await students();
+        let firstName = validate.validateFirstName(updatedStudents.firstName);
+        let lastName = validate.validateLastName(updatedStudents.lastName);
+        let email = validate.validateEmail(updatedStudents.email);
+        let password = validate.validatePassword(updatedStudents.password);
+        const studentCollection = await students();
+
         let updatedStudentsData = {};
-        let gotten = await this.getStudents(id);
-        if (JSON.stringify(updatedStudents) == JSON.stringify(gotten)) {
+        let studentDetails = await this.getStudents(id);
+        if (JSON.stringify(updatedStudents) == JSON.stringify(studentDetails)) {
             return await this.getStudents(id);
         }
-
-        if (updatedStudents.firstName) {
-            updatedStudentsData.firstName = updatedStudents.firstName;
-        }
-        if (updatedStudents.lastName) {
-            updatedStudentsData.lastName = updatedStudents.lastName;
-        }
-        if (updatedStudents.email) {
-            updatedStudentsData.email = updatedStudents.email;
-        }
-        if (updatedStudents.hashedPassword) {
-            updatedStudentsData.hashedPassword = updatedStudents.hashedPassword;
-        }
-
-        if (updatedStudentsData == {}) {
+        updatedStudentsData.firstName = firstName;
+        updatedStudentsData.lastName = lastName;
+        updatedStudentsData.email = email;
+        updatedStudentsData.hashedPassword = password;
+        if (updatedStudentsData == {})
             return await this.getStudents(id);
-        }
-        const updateInfoStudents = await userCollection.updateOne({ _id: id }, { $set: updatedStudentsData });
-        if (updateInfoStudents.modifiedCount === 0 && updateInfoStudents.deletedCount === 0) throw "could not update user";
+        const updateInfoStudents = await studentCollection.updateOne({ _id: id }, { $set: updatedStudentsData });
+        if (updateInfoStudents.modifiedCount === 0 && updateInfoStudents.deletedCount === 0) throw "could not able to update students";
         return await this.getStudents(id);
-    }
+    },
+    async checkStudent(email, password) {
+        console.log("1")
+         email = validate.validateEmail(email);
+         password = validate.validatePassword(password);
+        const studentCollection = await students();
+       
+        email = email.toLowerCase();
+        const student = await studentCollection.findOne({ email: email });
+        
+        if (student) {
+          
+          const samePassord = await bcrypt.compare(password, student.hashedPassword);
+          if (samePassord){
+            
+            return { student: student };
+          }else
+            throw "Either the email or password is invalid";
+        } else
+        throw "Either the email or password is invalid";
+    },
 }

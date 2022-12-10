@@ -15,7 +15,7 @@ router.get("/admin", async (req, res) => {
     res.status(401).redirect("/students/login");
   } else{ 
     try {
-      const courseList = await courses.getcoursesByOwner(req.session.AuthCookie);
+      const courseList = await courses.getCoursesByOwner(req.session.AuthCookie);
       // const userLoggedIn = (req.session.AuthCookie) ? true : false;
       res.status(200).render("admin", { courses: courseList, userLoggedIn: true })
     } catch (e) {
@@ -31,7 +31,7 @@ router.get("/edit/:id", async (req, res) => {
   } else if (!courses.checkcourseOwnership(req.params.id, req.session.AuthCookie)) {
     res.status(401).redirect("/courses/admin");
   } else {
-    let course = await courses.getcourse(req.params.id);
+    let course = await courses.getCourse(req.params.id);
     res.status(200).render("editcourse", { course: course, userLoggedIn: true })
   }
 });
@@ -104,7 +104,7 @@ router.get("/:id", async (req, res) => {
         studentData = await students.getStudents(studentId);
         studentData.reviewedcoursePage = reviewList.some(item => item.studentId === String(studentData._id));
       }
-      course = await courses.getcourse(req.params.id);
+      course = await courses.getCourse(req.params.id);
       res.status(200).render("course", { course: course, reviews: reviewList, userLoggedIn: userLoggedIn, loggedInReviewer: loggedInReviewer, currentStudentsData: studentData, hasError: hasError, error: error})
     } catch (e) {
       res.status(404).json({ message: "course not found!" });

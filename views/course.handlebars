@@ -1,12 +1,17 @@
 <main>
     <div class="card-wide" id ="sticky">
         <h1>{{course.name}}</h1>
-        <p class = "category">{{course.category}}</p>
-        <p>{{course.address}}</p>
-        <p>{{course.city}}, {{course.state}} {{course.zip}}</p>
+        <p>{{course.credits}}</p>
+        <p>Professor: {{course.professorname}},  Email:{{course.professoremail}} </p>
+        <p>TA: {{course.taname}},  Email: {{course.taemail}}</p>  
         <p class="avg">{{course.rating}}/5 ({{course.reviews.length}} Reviews)</p>
-        <p><a href="https://{{course.website}}">More Info!</a></p>
-        <div id="gmap" style="height:400px; width:100%;"></div> <!-- Some courses already have a pin on Google maps, and manual pin is somewhat inaccurate due to our estimation -->
+        <p> Select semester:
+            <select id="selectSemester">
+                <option >Fall 2022</option>
+                <option >Spring 2022</option>
+                <option >Fall 2021</option>
+            </select>
+        </p>
     </div>
     
     <div class="card-wide" id="right">
@@ -16,9 +21,6 @@
                 <div class = "card-full">
                     <div class="reviewHeading">
                         <div class="reviewerName">
-                            <div class="reviewerIcon">
-                            <img src="/students/profilepic/{{this.user._id}}" onerror="this.src='/public/images/Avatar.png'" alt="Profile Picture" class="profileIcon">
-                            </div>
                             <h3 class = "p_inline"><a href="/students/{{this.user._id}}">{{this.user.firstName}} {{this.user.lastName}}</a></h3>
                         </div>
                         <div class="reviewerRating">
@@ -126,6 +128,5 @@
         {{/if}}
     </div>
     
-    <script src="/public/javascript/maps.js" latitude={{course.latitude}} longitude={{course.longitude}}></script>
     <script src="/public/javascript/forms.js"></script>
 </main>

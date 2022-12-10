@@ -4,24 +4,18 @@
             <div class="courses_title">
                 <h1>courses</h1>
             </div>
-            <div class="ratingFilter">
-                <div class="dropdown">
-                    <button class="dropbtn">Sort by Rating</button>
-                    <div class="dropdown-content">
-                        <p onclick="sortCardsDescending()" class="btn">High to Low</p>
-                        <p onClick="sortCardsAscending()" class="btn">Low to High</p>
-                    </div>
-                </div>
+            <div class="admin">
+                 <h1><a href="/courses/admin">Admin</h1>
             </div>
         </div>
     </div>
     <div class = "course_Collection"> <!-- Note: When changing this section be sure to modify sort.js as well --> 
     {{#each courses}}
         <div class = "card" onclick="location.href='../courses/{{this._id}}';">
-            <h2><a href="/courses/{{this._id}}">{{this.name}}</a></h2>
-            <p class = "category">{{this.category}}</p>
-            <p>{{this.address}}</p>
-            <p>{{this.city}}, {{this.state}} {{this.zip}}</p>  
+            <h2><a href="/courses/{{this._id}}">{{this.courseId}} {{this.name}}</a></h2>
+            <p>{{this.credits}}</p>
+            <p>Professor: {{this.professorname}},  Email:{{this.professoremail}} </p>
+            <p>TA: {{this.taname}},  Email: {{this.taemail}}</p>  
             {{#if this.rated}}  
             <p class="avg">{{this.rating}}/5</p>
             {{else}}

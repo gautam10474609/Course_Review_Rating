@@ -102,6 +102,44 @@ input[type="password"] {
     display: block;
 }
 
+.loginInput{
+    display: block;
+    text-align: center;
+    text-align-last: center;
+    margin: auto;
+    margin-bottom: 15px;
+    width: 75%;
+    color: #001514;
+    font-weight: bold;
+    font-size: medium;
+    letter-spacing: 1px;
+    background-color: rgba(136, 126, 126, 0.04);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    box-sizing: border-box;
+    border: 2px solid rgba(0, 0, 0, 0.02);
+}
+.registerInput{
+    display: block;
+    text-align: center;
+    text-align-last: center;
+    margin: auto;
+    margin-bottom: 15px;
+    width: 75%;
+    color: #001514;
+    font-weight: bold;
+    font-size: medium;
+    letter-spacing: 1px;
+    background-color: rgba(136, 126, 126, 0.04);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    box-sizing: border-box;
+    border: 2px solid rgba(0, 0, 0, 0.02);
+}
 .inputFields{
     display: block;
     text-align: center;
@@ -293,7 +331,19 @@ input[type="password"] {
     padding: 1%;
     margin: 1%;
 }
-
+.loginPage {
+    background-color: #fafafa;
+    box-sizing: border-box;
+    display: block;
+    text-align: center;
+    float: left; 
+    width: 45%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 15px;
+    padding: 1%;
+    margin: 2%;
+}
 .card-wide {
     background-color: #fafafa;
     box-sizing: border-box;
@@ -336,7 +386,6 @@ input[type="password"] {
 
 .search-card-center {
     background-color: #fafafa;
-    box-sizing: border-box;
     display: block;
     text-align: center;
     width: 55%;
@@ -366,15 +415,6 @@ input[type="password"] {
 
 #white-card{
     background-color: white;
-}
-
-.reviewImg{
-    max-width: 90%;
-    padding: 10px;
-}
-.reviewImgIcon{
-    max-width: 70%;
-    padding: 10px;
 }
 
 
@@ -449,7 +489,7 @@ input[type="password"] {
     padding: 0;
 }
 
-.ratingFilter {
+.admin {
     width: 20%;
     float: right;
 }
@@ -594,7 +634,8 @@ input[type="password"] {
         float: left;
     }
 
-    .ratingFilter {
+    .admin {
+        color: #558000;
         width: 40%;
         padding:0;
         margin: 0;
