@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Course Review Rating</title>
-        <link rel="icon" type="image/png" sizes="16x16" href="../../public/images/favicon-16x16.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="../../public/images/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="96x96" href="../../public/images/favicon-96x96.png">
-        <meta name="theme-color" content="#ffffff">
-        <link rel="stylesheet" type="text/css" href="../../public/css/style.css">
-        <link href="https://fonts.googleapis.com/css?family=Monstserrat|Mukta&amp;display=swap" rel="stylesheet">
-    </head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Course Review Rating</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="../../public/images/favicon-16x16.png">
+
+    <link rel="stylesheet" type="text/css" href="../../public/css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Monstserrat|Mukta&amp;display=swap" rel="stylesheet">
+</head>
+    
     <body>
         <nav>
             <li><a href="/">Home</a></li>
             <li><a href="/courses">Courses</a></li>
             {{#if userLoggedIn}}
                 <li><a href="/students/profile" id="profile">Profile</a></li>
-                <li><a href="/courses/admin">Admin</a></li>
                 <li><a href="/students/logout" id ="logout">Logout</a></li>
             {{else}}
                 <li><a href="/students/login" id="auth">Login</a></li>
+                <li><a href="/courses/admin">Admin</a></li>
             {{/if}}
         </nav>
         {{{ body }}}

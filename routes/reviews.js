@@ -8,21 +8,6 @@ const comments = data.comments;
 const mongoCollections = require("../config/mongoCollections");
 const cour = mongoCollections.courses;
 const { ObjectId } = require('mongodb');
-const multer = require('multer');
-const path = require('path');
-
-var fs = require('fs');
-// SET STORAGE
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now())
-  }
-})
- 
-var upload = multer({ storage: storage })
 
 router.get("/:id", async (req, res) => {
   let isReviewer = false;
@@ -30,7 +15,6 @@ router.get("/:id", async (req, res) => {
       const review = await reviews.getReview(req.params.id);
       const user = await students.getStudents(review.studentId);
       const course = await courses.getCourse(review.courseId);
-      // if the reviewer is on the page, give them a button to edit
       if(req.session.AuthCookie === review.studentId) {
         isReviewer = true;
       }
@@ -40,7 +24,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-router.post("/:id/add", upload.single('picture'), async (req, res) => {
+router.post("/:id/add", async (req, res) => {
   const data = req.body;
   const rating = data.rating;
   const reviewText = data.reviewText;
@@ -148,7 +132,7 @@ router.get("/:id/edit", async (req, res) => {
     }
 });
 
-router.post("/:id/edit", upload.single('picture'), async (req, res) => {
+router.post("/:id/edit",  async (req, res) => {
   const data = req.body;
   const rating = data.rating;
   const reviewText = data.reviewText;

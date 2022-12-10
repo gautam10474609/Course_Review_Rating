@@ -9,15 +9,12 @@ const commentFunctions = require("./comments")
 // const uuid = require('uuid/v4');
 
 module.exports = {
-    async addReview(courseId, studentId, reviewText, rating, reviewPicture) {
+    async addReview(courseId, studentId, reviewText, rating) {
         if (!courseId || (typeof courseId != "string")) throw "course ID must be given as a string";
         if (!studentId || (typeof studentId != "string")) throw "user ID must be given as a string";
         if (!reviewText || (typeof reviewText != "string")) throw "review text must be given as a string";
         if (!rating || (typeof rating != "number") || (rating < 1) || (rating > 5)) throw "rating must be given as a number from 1 to 5";
-        if (!reviewPicture || reviewPicture == "") {
-            reviewPicture = "";
-        } 
-        // else if(reviewPicture != "" && (typeof reviewPicture != "object")) throw "must give reviewPicture as an Object";
+         
         
         const reviewCollection = await reviews();
         let newReview = {
@@ -25,8 +22,7 @@ module.exports = {
             studentId: studentId,
             reviewText: reviewText,
             rating: rating,
-            comments: [],
-            reviewPicture: reviewPicture
+            comments: []
         }
         const alreadyReviewed = await reviewCollection.findOne({ 
             $and: [{
@@ -95,10 +91,7 @@ module.exports = {
             updatedReviewData.rating = updatedReview.rating;
         }
 
-        if (updatedReview.reviewPicture) {
-            updatedReviewData.reviewPicture = updatedReview.reviewPicture;
-        }
-        // console.log(updatedReviewData);
+       
         await reviewCollection.updateOne({_id: id}, {$set: updatedReviewData});
         return await this.getReview(id);
     },
