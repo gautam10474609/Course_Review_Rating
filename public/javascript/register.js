@@ -33,38 +33,38 @@
 
     if (firstNameVal.length == 0) {
       document.getElementById("firstnameError").innerHTML = "Please enter firstname"
-      $("#firstnameError").show().fadeOut(6000);
+      $("#firstnameError").show().fadeOut(3000);
       firstName.focus();
       valid = true
     }
   
     if (lastNameVal.length == 0) {
       document.getElementById("lastnameError").innerHTML = "Please enter lastname"
-      $("#lastnameError").show().fadeOut(6000);
+      $("#lastnameError").show().fadeOut(3000);
       valid = true
     }
 
     if (emailVal.length == 0) {
       document.getElementById("emailError").innerHTML = "Please enter email"
-      $("#emailError").show().fadeOut(6000);
+      $("#emailError").show().fadeOut(3000);
       valid = true;
     }else if (!validateEmail(emailVal)) {
       document.getElementById("emailError").innerHTML = "Please enter valid email"
-      $("#emailError").show().fadeOut(6000);
+      $("#emailError").show().fadeOut(3000);
       valid = true;
     }
 
     if (passwordVal.length == 0) {
       document.getElementById("passwordError").innerHTML = "Please enter password"
-      $("#passwordError").show().fadeOut(6000);
+      $("#passwordError").show().fadeOut(3000);
       valid = true;
     } else if (passwordVal.length < 8) {
       document.getElementById("passwordError").innerHTML = "Password should be atleast 8 characters long"
-      $("#passwordError").show().fadeOut(6000);
+      $("#passwordError").show().fadeOut(3000);
       valid = true;
     } else if (!validatePassword(passwordVal)) {
       document.getElementById("passwordError").innerHTML = "Password should contain one uppercase, one lower case, one special character and one number"
-      $("#passwordError").show().fadeOut(6000);
+      $("#passwordError").show().fadeOut(3000);
       valid = true;
     }
 
@@ -91,5 +91,6 @@
         error.show();
       },
     });
+   
   });
 })(window.jQuery);
