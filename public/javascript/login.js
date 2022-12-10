@@ -55,7 +55,7 @@
       url: "/students/login",
       contentType: "application/json",
       data: JSON.stringify({
-        username: emailVal,
+        email: emailVal,
         password: passwordVal,
       }),
       dataType: "text",

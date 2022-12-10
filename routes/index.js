@@ -11,13 +11,12 @@ const constructorMethod = app => {
   
   app.get("/", (req, res) => {
     let userLoggedIn = false;
-    let studentId = req.session.AuthCookie;
-    if(!studentId) {
+    let authCookie = req.session.AuthCookie;
+    if(!authCookie) {
       userLoggedIn = false;
     } else {
       userLoggedIn = true;
     }
-
     res.status(200).render("index", {userLoggedIn: userLoggedIn});
   });
 
