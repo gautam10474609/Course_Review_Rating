@@ -60,7 +60,7 @@ router
   router.route('/register')
   .get(async (req, res) => {
     let authCookie = req.session.AuthCookie;
-    if (req.session.username && authCookie) {
+    if (authCookie) {
       res.status(200).redirect("/students/profile");
     } else {
       let e = "Not Authorized"
@@ -85,10 +85,25 @@ router
     
   });
 
+  router.get("/myprofile", async (req, res) => {
+    let authCookie = req.session.AuthCookie;
+    if (authCookie) {
+      const currentStudents = await students.getStudents(authCookie);
+        return res.status(307).render('myprofile', {
+          id : authCookie,
+          firstName: currentStudents.firstName,
+          lastName: currentStudents.lastName,
+          email: currentStudents.email
+        });  
+    } else {
+      return res.redirect("/students/login");
+    }
+  });
+
   router.get("/profile", async (req, res) => {
     let authCookie = req.session.AuthCookie;
     if (authCookie) {
-      let studentId = req.session.AuthCookie;
+      let studentId = authCookie;
       let studentData = await students.getStudents(studentId);
       let reviewObject = [];
       for (i=0; i<studentData.reviewIds.length; i++) {
@@ -112,21 +127,7 @@ router
     }  
 });
 
-router.get("/myprofile", async (req, res) => {
-  let authCookie = req.session.AuthCookie;
-  if (authCookie) {
-    const currentStudents = await students.getStudents(req.session.AuthCookie);
-      return res.status(307).render('myprofile', {
-        id : req.session.AuthCookie,
-        firstName: currentStudents.firstName,
-        lastName: currentStudents.lastName,
-        email: currentStudents.email,
-        isEditing: false,
-        userLoggedIn: true});  
-  } else {
-    return res.redirect("/students/login");
-  }
-});
+
 
 router.get("/:id", async (req, res) => {
   let userLoggedIn = false;

@@ -126,18 +126,6 @@ router.post("/:id/add", upload.single('picture'), async (req, res) => {
   }
 });
 
-router.get('/reviewPic/:id', async (req, res) => {
-  const getReviewData = await reviews.getReview(req.params.id);
-  const reviewPicData = getReviewData.reviewPicture;
-  if(reviewPicData == ""){
-    return res.status(400).send({
-      message: 'No Review Pic Found!'
-   })
-  } else {
-    res.contentType('image/jpeg');
-    res.send(reviewPicData.image.buffer);
-  }
-});
   
 router.get("/", async (req, res) => {
     try {
