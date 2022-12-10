@@ -4,13 +4,13 @@ body{
     margin: 0;
     padding-top: 15px;
     background: url("../images/BG1.png");
-    background-size: 100%;
     background-attachment: fixed;
+    background-size: 100%;
 }
 
 main{
+    padding-bottom: 12px;
     align-items: center;
-    padding-bottom: 10px;
 }
 
 .private{
@@ -22,32 +22,32 @@ main{
 
 h1{
     text-align: center;
-    color: #6ca000;
-    background-color: #fafafa;
-    font-size: xx-large;
-    font-family: 'Montserrat', sans-serif;
+    color: #ce01f7;
+    background-color: #ffffff;
+    font-size: x-large;
+    font-family: "Poppins", sans-serif;
     padding: 0.5%
 }
 
 h2{
     text-align: center;
-    color: #6ca000;
-    font-size: x-large;
-    font-family: 'Montserrat', sans-serif;
+    color: #ce01f7;
+    font-size: large;
+    font-family: "Poppins", sans-serif;
 }
 
 h3{
-    color: #6ca000;
+    color: #ce01f7;
     text-align: center;
     font-weight: bold;
     font-size: large;
-    font-family: 'Montserrat', sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 h4{
-    color: #567f00;
+    color: #ce01f7;
     font-size: large;
-    font-family: 'Montserrat', sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 p{
@@ -159,14 +159,26 @@ input[type="password"] {
     box-sizing: border-box;
     border: 2px solid rgba(0, 0, 0, 0.02);
 }
-#profilePicture{
-    padding-left: 30px;
+.inputData{
+    display: block;
+    text-align: center;
+    text-align-last: center;
+    margin: auto;
+    margin-bottom: 15px;
+    width: 75%;
+    color: #001514;
+    font-weight: bold;
+    font-size: medium;
+    letter-spacing: 1px;
+    background-color: rgba(136, 126, 126, 0.04);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    box-sizing: border-box;
+    border: 2px solid rgba(0, 0, 0, 0.02);
 }
 
-.profile-pic {
-    width: 200px;
-    height: 200px;
-}
 
 /* .error {
     min-width: 150px;
@@ -302,12 +314,9 @@ input[type="password"] {
     background-color: #0076cb;
 }
 
-#search-bar {
+#searchCourse {
     width: 400px;
     margin: 0 auto;
-}
-
-#search-form {
     text-align: center;
 }
 
@@ -395,7 +404,7 @@ input[type="password"] {
     margin-top: 5%
 }
 
-.search-card-center {
+.container {
     background-color: #fafafa;
     display: block;
     text-align: center;

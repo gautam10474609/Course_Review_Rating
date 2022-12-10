@@ -89,14 +89,20 @@
     <div class="form-popup" id="myForm">
         <h2>Post a Review</h2>
         <form id="login-form" name ="loginForm" class="form-container" enctype="multipart/form-data" action="/reviews/{{course._id}}/add" method="POST">
+            <p> Select semester:
+            <select id="selectSemester">
+                <option >Fall 2022</option>
+                <option >Spring 2022</option>
+                <option >Fall 2021</option>
+            </select>
+            </p>
             <label>
                 <input type="text" name="rating" id="rating" class = "inputFields" pattern="\d+" placeholder="Enter your Rating" required title="Enter a Number from 1 to 5"/> 
             </label>
             <label>
                 <input type="text" name="reviewText" id="reviewText" class = "inputFields" placeholder="Enter your Review" required/>
             </label>
-            <input type="file" name="picture" accept="image/*" class=""/>
-            <button type="submit" class="btn">Post!</button>
+           <button type="submit" class="btn">Post!</button>
             <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
         </form>
     </div>

@@ -19,9 +19,9 @@ router
   .get(async (req, res) => {
    let authCookie = req.session.AuthCookie;
    if (authCookie) {
-      res.status(200).redirect("/students/profile");
+      res.status(200).redirect("/courses");
     } else {
-      res.status(400).render("login");
+      res.render("login");
     }
   })
   .post(async (req, res) => {
@@ -39,7 +39,7 @@ router
         let studentId = await students.getStudentsId(email);
         req.session.AuthCookie = studentId;
         req.session.user = studentData.student;
-        res.status(200).redirect("/students/profile");
+        res.status(200).redirect("/courses");
       } else {
         res.status(400).render("login", { error: "Either the email or password is invalid" });
       }
@@ -131,10 +131,11 @@ router
 
 router.get("/:id", async (req, res) => {
   let userLoggedIn = false;
-  if (req.session.AuthCookie) {
+  let authCookie = req.session.AuthCookie
+  if (authCookie) {
     userLoggedIn = true;
   }
-  if (req.params.id === req.session.AuthCookie) {
+  if (req.params.id === authCookie) {
     return res.redirect("/students/profile");
   }
     try {
@@ -163,11 +164,10 @@ router.get("/:id", async (req, res) => {
   
 router.get("/", async (req, res) => {
     try {
-      const userList = await students.getAllStudentss();
+      const userList = await students.getAllStudents();
       res.status(200).json(userList);
     } catch (e) {
-      // Something went wrong with the server!
-      res.status(404).send();
+     res.status(404).send();
     }
 });
 
@@ -179,7 +179,6 @@ router.post("/myprofile", async (req, res) => {
   const data = req.body;
   const firstName = data.firstName;
   const lastName = data.lastName;
-  //const profilePicture = data.profilePicture;
   const email = data.email;
    const password = data.password;
   const confirm = data.confirm;
@@ -194,7 +193,6 @@ router.post("/myprofile", async (req, res) => {
     editedStudents = {
       firstName: firstName,
       lastName: lastName,
-      //profilePicture: profilePicture,
       email: email,
       hashedPassword: hashedPassword
     }

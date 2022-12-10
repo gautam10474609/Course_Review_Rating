@@ -85,7 +85,6 @@ module.exports = {
         return await this.getStudents(id);
     },
     async checkStudent(email, password) {
-        console.log("1")
          email = validate.validateEmail(email);
          password = validate.validatePassword(password);
         const studentCollection = await students();

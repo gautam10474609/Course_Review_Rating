@@ -25,7 +25,9 @@ function closeAlert() {
 function openCommentBox() {
     document.getElementById("row-override").style.display = "block";
 }
-
+function addReview(){
+    location.href = "/courses/addReview";
+}
 function commentBoxEditForm(index) {
     var formElement = "comment-form-" + index;
 
