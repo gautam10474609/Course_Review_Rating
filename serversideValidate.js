@@ -32,8 +32,8 @@ let validateFirstName = (firstName) => {
     if (typeof email !== "string") throw "email is not a string";
     email = email.trim();
     if (email === "") throw "email should not be blank spaces";
-    const emailRegex = new RegExp('^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$');
-    if(email.match(emailRegex)) throw "email is not proper format";
+    const emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+    if(!emailRegex.test(email))  throw "email is not proper format";
     return email
   };
 
