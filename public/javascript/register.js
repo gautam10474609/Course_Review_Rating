@@ -91,6 +91,5 @@
         error.show();
       },
     });
-   
   });
 })(window.jQuery);
