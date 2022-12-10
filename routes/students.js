@@ -61,10 +61,10 @@ router
   .get(async (req, res) => {
     let authCookie = req.session.AuthCookie;
     if (req.session.username && authCookie) {
-      res.redirect("/students/profile");
+      res.status(200).redirect("/students/profile");
     } else {
       let e = "Not Authorized"
-      res.render("register", {error:e});
+      res.status(400).render("register", {error:e});
     }
   }).post(async (req, res) => {
     try {

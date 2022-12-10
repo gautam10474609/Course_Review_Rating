@@ -188,6 +188,12 @@ input[type="password"] {
     color: rgb(255, 0, 0);
     font-size: 14px;
   }
+  
+.error{
+    margin-bottom: 10px;
+    color: rgb(255, 0, 0);
+    font-size: 14px;
+  }
 
 @keyframes cssAnimation {
     0%   {opacity: 1;}
