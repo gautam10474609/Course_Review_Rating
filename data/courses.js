@@ -120,20 +120,5 @@ module.exports = {
         const courseList = await courseCollection.find({}).toArray();
         if (courseList.length === 0) throw "no courses in the collection";
         return courseList;
-    },
-    
-    async checkcourseOwnership(courseId, studentId) {
-        if (!studentId) throw "Error (checkcourseOwnership): Must provide ID of user to check.";
-        if (!courseId) throw "Error (checkcourseOwnership): Must provide ID of course to check.";
-        if (typeof(studentId) === "string") studentId = ObjectId.createFromHexString(studentId);
-        if (typeof(courseId) === "string") courseId = ObjectId.createFromHexString(courseId);
-        const courseCollection = await courses();
-        const courseList = await courseCollection.find({ owner: studentId }).toArray();
-        for (let cs of courseList) {
-            if (courseId === cs._id) {
-                return true; // Break, course is in user's owned list
-            }
-        }
-        return false; // Students does not own course
     }
 }

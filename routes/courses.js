@@ -66,7 +66,7 @@ router.get("/:id", async (req, res) => {
           try { // Get comments of review
             for (let commentId of review.comments) {
               let comment = await comments.getComment(commentId);
-              comment.user = await students.getStudents(comment.studentId);
+              comment.student = await students.getStudents(comment.studentId);
               comment.courseId = req.params.id;
               // If this comment is by the logged in user, let them edit it from here
               if (req.session.AuthCookie === comment.studentId) {
@@ -88,7 +88,7 @@ router.get("/:id", async (req, res) => {
             review.isReviewer = false;
             loggedInReviewer = false;
           }
-          review.user = await students.getStudents(review.studentId);
+          review.student = await students.getStudents(review.studentId);
           reviewList.push(review); // This is a simple FIFO - can be improved or filtered in client JS
 
         }

@@ -13,12 +13,12 @@ router.get("/:id", async (req, res) => {
   let isReviewer = false;
     try {
       const review = await reviews.getReview(req.params.id);
-      const user = await students.getStudents(review.studentId);
+      const student = await students.getStudents(review.studentId);
       const course = await courses.getCourse(review.courseId);
       if(req.session.AuthCookie === review.studentId) {
         isReviewer = true;
       }
-      res.status(200).render("review", { review: review, user: user, course: course, isReviewer: isReviewer, id: req.params.id });
+      res.status(200).render("review", { review: review, student: student, course: course, isReviewer: isReviewer, id: req.params.id });
     } catch (e) {
       res.status(404).json({ message: "review not found!" });
     }
@@ -60,7 +60,7 @@ router.post("/:id/add", async (req, res) => {
           try { // Get comments of review
             for (commentId of review.comments) {
               comment = await comments.getComment(commentId);
-              comment.user = await students.getStudents(comment.studentId);
+              comment.student = await students.getStudents(comment.studentId);
               commentList.push(comment); // This is a simple FIFO - can be improved or filtered in client JS
             }
           } catch (e) {
@@ -75,7 +75,7 @@ router.post("/:id/add", async (req, res) => {
             review.isReviewer = false;
             loggedInReviewer = false;
           }
-          review.user = await students.getStudents(review.studentId);
+          review.student = await students.getStudents(review.studentId);
           reviewList.push(review); // This is a simple FIFO - can be improved or filtered in client JS
 
         }
@@ -160,13 +160,13 @@ router.post("/:id/edit",  async (req, res) => {
     }
     console.log(editedReview);
     const review = await reviews.getReview(req.params.id);
-    const user = await students.getStudents(review.studentId);
+    const student = await students.getStudents(review.studentId);
     const course = await courses.getCourse(review.courseId);
     const updatedReview = await reviews.updateReview(req.params.id, editedReview);
     if(req.session.AuthCookie === review.studentId) {
       isReviewer = true;
     }
-    return res.status(200).render("review", { review: updatedReview, user: user, course: course, isReviewer: isReviewer, id: req.params.id, userLoggedIn: true});
+    return res.status(200).render("review", { review: updatedReview, student: student, course: course, isReviewer: isReviewer, id: req.params.id, userLoggedIn: true});
   } catch (e) {
     console.log(e);
     res.status(404).json ({message: "could not update review"});

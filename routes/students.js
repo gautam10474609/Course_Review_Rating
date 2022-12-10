@@ -38,7 +38,7 @@ router
       if (studentData.student) {
         let studentId = await students.getStudentsId(email);
         req.session.AuthCookie = studentId;
-        req.session.user = studentData.student;
+        req.session.student = studentData.student;
         res.status(200).redirect("/courses");
       } else {
         res.status(400).render("login", { error: "Either the email or password is invalid" });
@@ -127,8 +127,6 @@ router
     }  
 });
 
-
-
 router.get("/:id", async (req, res) => {
   let userLoggedIn = false;
   let authCookie = req.session.AuthCookie
@@ -150,7 +148,7 @@ router.get("/:id", async (req, res) => {
         }
         reviewObject.push(reviewInfo);
       }
-      res.status(200).render("user", { 
+      res.status(200).render("student", { 
         id: studentData._id,
         firstName: studentData.firstName, 
         lastName: studentData.lastName, 
@@ -164,8 +162,8 @@ router.get("/:id", async (req, res) => {
   
 router.get("/", async (req, res) => {
     try {
-      const userList = await students.getAllStudents();
-      res.status(200).json(userList);
+      const studentList = await students.getAllStudents();
+      res.status(200).json(studentList);
     } catch (e) {
      res.status(404).send();
     }
@@ -212,7 +210,7 @@ router.post("/myprofile", async (req, res) => {
       email: updatedStudents.email,
       userLoggedIn: true})
     } catch(e) {
-      res.status(404).json({ message: "Could not update user!" });
+      res.status(404).json({ message: "Could not update student!" });
     }
   });
 
