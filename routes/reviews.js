@@ -112,22 +112,11 @@ router.post("/:id/add", upload.single('picture'), async (req, res) => {
   try {
     const reviewRating = req.body.rating;
     const reviewText = req.body.reviewText;
-    var finalImg = ""
-    console.log(req.file);
-    if(!req.file){
-      finalImg = "";
-    } else {
-      var img = fs.readFileSync(req.file.path);
-      var encode_image = img.toString('base64');
-      finalImg = {
-        contentType: req.file.mimetype,
-          image: Buffer.from(encode_image, 'base64')
-      };
-    }
+    
     
     let studentId = req.session.AuthCookie;
     let courseID = req.params.id;
-    const reviewForRes = await reviews.addReview(courseID, studentId, reviewText, Number(reviewRating), finalImg);
+    const reviewForRes = await reviews.addReview(courseID, studentId, reviewText, Number(reviewRating));
     console.log(reviewForRes);
     const redirectURL = "/courses/" + courseID;
     return res.redirect(redirectURL);
@@ -191,16 +180,10 @@ router.post("/:id/edit", upload.single('picture'), async (req, res) => {
         reviewText: reviewText
       }
     } else {
-      var img = fs.readFileSync(req.file.path);
-      var encode_image = img.toString('base64');
-      var finalImg = {
-        contentType: req.file.mimetype,
-          image: Buffer.from(encode_image, 'base64')
-      };
+     
       editedReview = {
         rating: rating,
-        reviewText: reviewText,
-        reviewPicture: finalImg
+        reviewText: reviewText
       }
     }
     console.log(editedReview);
