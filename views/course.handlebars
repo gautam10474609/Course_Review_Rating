@@ -88,7 +88,7 @@
     {{/if}}
     <div class="form-popup" id="myForm">
         <h2>Add a Review</h2>
-        <form id="login-form" name ="loginForm" class="form-container" enctype="multipart/form-data" action="/reviews/{{course._id}}/add" method="POST">
+        <form method="POST" action="/reviews/{{course._id}}/add">
             <p> Select semester:
             <select id="selectSemester">
                 <option >Fall 2022</option>
@@ -132,6 +132,6 @@
         </div>
         {{/if}}
     </div>
-    
+    <script src="/public/javascript/addReview.js"></script>
     <script src="/public/javascript/forms.js"></script>
 </main>
