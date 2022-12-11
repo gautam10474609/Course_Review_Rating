@@ -1,17 +1,21 @@
-const { ObjectId } = require('mongodb');
-
 const mongoCollections = require("../config/mongoCollections");
 const reviews = mongoCollections.reviews;
 const courses = mongoCollections.courses;
 const students = mongoCollections.students;
 const comments = mongoCollections.comments;
+const validate = require('../helper');
+let { ObjectId } = require('mongodb');
 
 module.exports = {
     async addReview(courseId, studentId, reviewText, rating) {
-        if (!courseId || (typeof courseId != "string")) throw "course ID must be given as a string";
-        if (!studentId || (typeof studentId != "string")) throw "user ID must be given as a string";
-        if (!reviewText || (typeof reviewText != "string")) throw "review text must be given as a string";
-        if (!rating || (typeof rating != "number") || (rating < 1) || (rating > 5)) throw "rating must be given as a number from 1 to 5";
+        id = validate.validateId(studentId, "studentId");
+        if (!ObjectId.isValid(studentId)) throw 'invalid object studentId';
+        id = validate.validateId(courseId, "courseId");
+        if (!ObjectId.isValid(courseId)) throw 'invalid object courseId';
+        reviewText = validate.validateText(reviewText, "reviewText")
+        rating = validate.validateNumber(rating, "rating")
+        if (rating < 1 || rating > 5) 
+            throw "Rating should be between 1 and 5";
          
         const reviewCollection = await reviews();
         let newReviewData = {
@@ -80,11 +84,6 @@ module.exports = {
         if (updatedReview.rating) {
             updatedReviewData.rating = updatedReview.rating;
         }
-
-        if (updatedReview.reviewPicture) {
-            updatedReviewData.reviewPicture = updatedReview.reviewPicture;
-        }
-        // console.log(updatedReviewData);
         await reviewCollection.updateOne({_id: id}, {$set: updatedReviewData});
         return await this.getReview(id);
     },

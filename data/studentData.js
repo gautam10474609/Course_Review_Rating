@@ -2,13 +2,13 @@ const studentDataModule = require("../students.js")
 
 async function getStudentsData(id) {
     let studentData = {};
-    studentData = studentDataModule.students.find(user => user._id === id)
+    studentData = studentDataModule.students.find(student => student._id === id)
     return studentData;
 }
 
 async function getStudentsId(email) {    
     let studentData = {};
-    studentData = studentDataModule.students.find(user => user.email === email)
+    studentData = studentDataModule.students.find(student => student.email === email)
     return studentData._id;
 }
 

@@ -215,7 +215,7 @@ router.post("/edit", async (req, res) => {
 router.post("/search", async (req, res) => {
   const body = req.body;
   try {
-    let courseList = await courses.getCoursesViaSearch(body.search);
+    let courseList = await courses.getCoursesFromSearch(body.search);
     let newcourseList = [];
     for (course of courseList) {
       if (course.reviews.length > 0) {
