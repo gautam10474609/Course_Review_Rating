@@ -55,13 +55,14 @@ router.route('/admin')
   router
   .route("/add")
   .get(async (req, res) => {
-    console.log("test1")
     let adminLoggedIn = false;
-    if (!req.session.AuthCookie) {
+    if (req.session.AuthCookie) {
       adminLoggedIn = true;
       res.render("addCourse",{
         adminLoggedIn: adminLoggedIn
       });
+    }else{
+      res.status(401).redirect("/courses/admin");
     }
     
   }).post(async (req, res) => {
