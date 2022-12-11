@@ -9,10 +9,7 @@ const students = data.students;
 const courses = data.courses;
 const reviews = data.reviews;
 const bcrypt = require("bcryptjs");
-const studentData = mongoCollections.students;
 const xss = require('xss');
-const path = require('path');
-var fs = require('fs');
 
 router
   .route('/login')
@@ -26,10 +23,8 @@ router
   })
   .post(async (req, res) => {
     try {
-      console.log("12")
       let email = validate.validateEmail(req.body.email);
       let password = validate.validatePassword(req.body.password);
-      console.log("123", req.body.email)
       email = email.toLowerCase()
       const studentData = await students.checkStudent(
         email,
@@ -168,50 +163,5 @@ router.get("/", async (req, res) => {
      res.status(404).send();
     }
 });
-
-router.post("/myprofile", async (req, res) => {
-  let hasErrors = false;
-  let errors = [];
-  let editedStudents;
-  let hashedPassword;
-  const data = req.body;
-  const firstName = data.firstName;
-  const lastName = data.lastName;
-  const email = data.email;
-   const password = data.password;
-  const confirm = data.confirm;
-
-  if (password != confirm) {
-    hasErrors = true;
-    errors.push("Passwords must match");
-    return res.render("myprofile", {hasErrors: hasErrors, errors: errors});
-  }
-  if (password) {
-    hashedPassword = bcrypt.hashSync(password, 10);
-    editedStudents = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      hashedPassword: hashedPassword
-    }
-  } else {
-    editedStudents = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email
-    }
-  }
-  try {
-    const updatedStudents = await students.updateStudents(req.session.AuthCookie, editedStudents);
-    return res.render('myprofile', { 
-      id: req.session.AuthCookie,
-      firstName: updatedStudents.firstName,
-      lastName: updatedStudents.lastName,
-      email: updatedStudents.email,
-      userLoggedIn: true})
-    } catch(e) {
-      res.status(404).json({ message: "Could not update student!" });
-    }
-  });
 
 module.exports = router;

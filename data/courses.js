@@ -1,50 +1,19 @@
-const { ObjectId } = require('mongodb');
-
 const mongoCollections = require("../config/mongoCollections");
 const courses = mongoCollections.courses;
+const validate = require('../helper');
+let { ObjectId } = require('mongodb');
 
 module.exports = {
     async addCourse(name, courseId, professorname, taname, credits, professoremail, taemail) {
-        if (!name || (typeof name != "string")) throw "Name should be string";
-        if (!courseId || (typeof courseId != "string")) throw "Name should be string";
-        if (!professorname || (typeof professorname != "string")) throw "Professor Name should be string";
-        if (!taname || (typeof taname != "string")) throw "TA Name should be string";
-        if (!credits || (typeof credits != "number")) throw "Credits should be number";
-        if (!professoremail || (typeof professoremail != "string")) throw "Professor email should be string";
-        if (!taemail || (typeof taemail != "string")) throw "TA email should be string";
+        name = validate.validateName(name, "course Name");
+        courseId = validate.validateEmail(courseId, "courseId");
+        professorname = validate.validateName(professorname, "Profesor Name");
+        taname = validate.validateName(taname, "TA Name");
+        professoremail = validate.validateEmail(professoremail, "Professor Email");
+        taemail = validate.validateEmail(taemail, "TA Email");
+        if (!credits) throw "Credits should not be empty";
         const courseCollection = await courses();
-        let newCourse = {
-            name: name,
-            courseId: courseId,
-            professorname: professorname,
-            taname: taname,
-            credits: credits,
-            professoremail: professoremail,
-            taemail: taemail,           
-            admin: "",
-            rating: 0,
-            reviews: [],
-        }
-        const insertInfo = await courseCollection.insertOne(newCourse);
-        if (insertInfo.insertedCount === 0) throw "could not add courses";
-        const newId = insertInfo.insertedId;
-        const newIDString = String(newId);
-        const course = await this.getCourse(newIDString);
-        return course;
-    },
-
-    async addCourseWithAdmin(name, courseId, professorname, taname, credits, professoremail, taemail, admin) {
-        if (!name || (typeof(name) !== "string")) throw "Error (addCourseWithAdmin): Name should be string.";
-        if (!courseId || (typeof(courseId) !== "string")) throw "Error (addCourseWithAdmin): courseId suould be string.";
-        if (!professorname || (typeof(professorname) !== "string")) throw "Error (addCourseWithAdmin): Professor name should be string.";
-        if (!taname || (typeof(taname) !== "string")) throw "Error (addCourseWithAdmin): TA Name should be string.";
-        if (!credits || (typeof(credits) !== "number")) throw "Error (addCourseWithAdmin): Credits shoulbe be string.";
-        if (!professoremail || (typeof(professoremail) !== "string")) throw "Error (addCourseWithAdmin): Professor email ahould be string.";
-        if (!taemail || (typeof(taemail) !== "string")) throw "Error (addCourseWithAdmin): TA email should be string.";
-        if (!admin) throw "Error (addCourseWithAdmin): Admin ID must be included.";
-        if (typeof(admin) === "string") admin = ObjectId.createFromHexString(admin);
-        const courseCollection = await courses();
-        let newCourse = {
+        let addNewCourse = {
             name: name,
             courseId: courseId,
             professorname: professorname,
@@ -52,27 +21,77 @@ module.exports = {
             credits: credits,
             professoremail: professoremail,
             taemail: taemail,
-            owner: owner,
+            admin: "",
             rating: 0,
             reviews: [],
         }
-        const insertInfo = await courseCollection.insertOne(newCourse);
-        if (insertInfo.insertedCount === 0) throw "Error (addCourseWithAdmin): Failed to add course to DB.";
-        const id = insertInfo.insertedId;
-        const course = await this.getCourse(id);
+        const insertInfo = await courseCollection.insertOne(addNewCourse);
+        if (!insertInfo.acknowledged || !insertInfo.insertedId) {
+            throw 'Could not add new course';
+        }
+        const newId = insertInfo.insertedId.toString();
+        const course = await this.getCourse(newId);
+        return course;
+    },
+
+    async addCourseByAdmin(name, courseId, professorname, taname, credits, professoremail, taemail, admin) {
+        name = validate.validateName(name, "course Name");
+        courseId = validate.validateEmail(courseId, "courseId");
+        professorname = validate.validateName(professorname, "Profesor Name");
+        taname = validate.validateName(taname, "TA Name");
+        professoremail = validate.validateEmail(professoremail, "Professor Email");
+        taemail = validate.validateEmail(taemail, "TA Email");
+        if (!credits) throw "Credits should not be empty";
+        if (!admin || typeof admin !== "string") throw "Admin should not be empty";
+        admin = ObjectId.createFromHexString(admin);
+        const courseCollection = await courses();
+        let addNewCoursebyAdmin = {
+            name: name,
+            courseId: courseId,
+            professorname: professorname,
+            taname: taname,
+            credits: credits,
+            professoremail: professoremail,
+            taemail: taemail,
+            admin: admin,
+            rating: 0,
+            reviews: [],
+        }
+        const insertInfo = await courseCollection.insertOne(addNewCoursebyAdmin);
+        if (!insertInfo.acknowledged || !insertInfo.insertedId) {
+            throw 'Could not add new course';
+        }
+        const newId = insertInfo.insertedId.toString();
+        const course = await this.getCourse(newId);
+        return course;
+    },
+
+    async getAllcourses() {
+        const courseCollection = await courses();
+        const allCourses = await courseCollection.find({}).toArray();
+        if (!allCourses) throw "There are no courses";
+        return allCourses;
+    },
+
+    async getCourse(id) {
+        id = validate.validateId(id);
+        if (!ObjectId.isValid(id)) throw 'invalid object id';
+        const courseCollection = await courses();
+        const course = await courseCollection.findOne({ _id: ObjectId(id) });
+        if (!course) throw `No course exists with the ${id}`;
         return course;
     },
 
     async updateCourse(id, name, courseId, professorname, taname, credits, professoremail, taemail) {
-        if (!id) throw "Error (updateCourse): Course ID must be included.";
-        if (typeof(id) === "string") id = ObjectId.createFromHexString(id);
-        if (!name || (typeof(name) !== "string")) throw "Error (updateCourse): Name should be string.";
-        if (!courseId || (typeof(courseId) !== "string")) throw "Error (updateCourse): courseId should be string.";
-        if (!professorname || (typeof(professorname) !== "string")) throw "Error (updateCourse): Professor name should be string.";
-        if (!taname || (typeof(taname) !== "string")) throw "Error (updateCourse): TA Name should be string.";
-        if (!credits || (typeof(credits) !== "number")) throw "Error (updateCourse): Credits shoulbe be string.";
-        if (!professoremail || (typeof(professoremail) !== "string")) throw "Error (updateCourse): Professor email ahould be string.";
-        if (!taemail || (typeof(taemail) !== "string")) throw "Error (updateCourse): TA email should be string.";
+        id = validate.validateId(id, "id");
+        if (!ObjectId.isValid(id)) throw 'invalid object id';
+        name = validate.validateName(name, "course Name");
+        courseId = validate.validateEmail(courseId, "courseId");
+        professorname = validate.validateName(professorname, "Profesor Name");
+        taname = validate.validateName(taname, "TA Name");
+        professoremail = validate.validateEmail(professoremail, "Professor Email");
+        taemail = validate.validateEmail(taemail, "TA Email");
+        if (!credits) throw "Credits should not be empty";
         const courseCollection = await courses();
         let updatedCourse = {
             name: name,
@@ -83,42 +102,17 @@ module.exports = {
             professoremail: professoremail,
             taemail: taemail
         }
-        const updateInfo = await courseCollection.updateOne({ _id: id }, {$set: updatedCourse});
-        if (updateInfo.modifiedCount === 0) throw "Error (updatedCourse): Failed to update course in DB.";
-        const course = await this.getCourse(id);
+        const updateInfo = await courseCollection.updateOne({ _id: ObjectId.createFromHexString(id) }, { $set: updatedCourse });
+        if (!updateInfo.modifiedCount) throw "Could not update course";
+        const course = await this.getCourse(ObjectId.createFromHexString(id));
         return course;
     },
 
-    async getCourse(id) {
-        if (!id) throw "id must be given";
-        if (typeof(id) === "string") id = ObjectId.createFromHexString(id);
+    async getCoursesFromSearch(search) {
+        search = validate.validateString(search, "Search");
         const courseCollection = await courses();
-        const course = await courseCollection.findOne({ _id: id});
-        if (!course) throw "course with that id does not exist";
-        return course;
-    },
-
-    async getCoursesViaSearch(search) {
-        if (!search) throw "Error (getCoursesViaSearch): Must provide search.";
-        if (typeof(search) !== "string") throw "Error (getCoursesViaSearch): Search must be a string.";
-        const courseCollection = await courses();
-        const query = new RegExp(search, "i");
-        const courseList = await courseCollection.find({ $or: [ {category: {$regex: query}}, {name: {$regex: query}} ] }).toArray();
-        return courseList;
-    },
-
-    async getCoursesByProfessor(ownerId) {
-        if (!ownerId) throw "Error (getCoursesByProfessor): Must provide ID of owner to find courses for.";
-        if (typeof(ownerId) === "string") ownerId = ObjectId.createFromHexString(ownerId);
-        const courseCollection = await courses();
-        const courseList = await courseCollection.find({ owner: ownerId }).toArray();
-        return courseList;
-    },
-
-    async getAllcourses() {
-        const courseCollection = await courses();
-        const courseList = await courseCollection.find({}).toArray();
-        if (courseList.length === 0) throw "no courses in the collection";
-        return courseList;
+        const regSearch = new RegExp(search, "i");
+        const allCourses = await courseCollection.find({ name: { $regex: regSearch } }).toArray();;
+        return allCourses;
     }
 }
