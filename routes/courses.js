@@ -39,7 +39,7 @@ router.route('/admin')
       const adminData = await courses.checkAdmin(xss(email), xss(password));
       if (adminData.insertedAdmin) {
         req.session.AuthCookie = adminCookieString;
-        res.status(200).render("addCourse");
+        res.redirect("/courses/add");
       } else {
         res.status(400).render("admin", {
           error: "Either the email or password is invalid"
@@ -50,13 +50,101 @@ router.route('/admin')
         error: e
       });
     }
+  })
 
+  router
+  .route("/add")
+  .get(async (req, res) => {
+    console.log("test1")
+    let adminLoggedIn = false;
+    if (!req.session.AuthCookie) {
+      adminLoggedIn = true;
+      res.render("addCourse",{
+        adminLoggedIn: adminLoggedIn
+      });
+    }
+    
+  }).post(async (req, res) => {
+    if (!req.session.AuthCookie) {
+      res.status(401).redirect("/courses/admin");
+    } else {
+      let name = req.body.name;
+      let courseid = req.body.courseid;
+      let professorname = req.body.professorname;
+      let taname = req.body.taname;
+      let credits = Number(req.body.credits);
+      let professoremail = req.body.professoremail;
+      let taemail = req.body.taemail;
+      try {
+        name = await validate.validateString(name, "name");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        courseid = await validate.validateString(courseid, "courseid");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        professorname = await validate.validateString(professorname, "professorname");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        credits = await validate.validateNumber(credits, "credits");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        taname = await validate.validateString(taname, "taname");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        professoremail = await validate.validateEmail(professoremail, "professoremail");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        taemail = await validate.validateEmail(taemail, "taemail");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        await courses.addCourse(name, courseid, credits, professorname, professoremail, taname,  taemail);
+        res.redirect("/courses");
+      } catch (e) {
+        console.log(e);
+      }
+    }
   })
 
 router.get("/", async (req, res) => {
   let studentLoggedIn = false;
   let studentId = req.session.AuthCookie;
   if (!studentId) studentLoggedIn = false;
+  if (studentId === adminCookieString) studentLoggedIn = false;
   else studentLoggedIn = true;
 
   let sumofRating = 0;
@@ -137,7 +225,7 @@ router.get("/:id", async (req, res) => {
   }
   try {
     let course = await courses.getCourse(id);
-    let studentLoggedIn = false, studentReviewLoggedIn = false;
+    let studentLoggedIn = false, studentReviewLoggedIn = false, adminLoggedIn= false;
     let totalofRating = 0, sumofRating = 0;
     let listOfReviews = []
     let studentData = {}
@@ -181,7 +269,10 @@ router.get("/:id", async (req, res) => {
       console.log(e);
     }
     if (!studentId) studentLoggedIn = false;
-    if (studentId === adminCookieString) studentLoggedIn = false;
+    else if (studentId === adminCookieString) {
+      studentLoggedIn = false;
+      adminLoggedIn = true
+    }
     else {
       studentLoggedIn = true;
       studentData = await students.getStudents(studentId);
@@ -193,7 +284,8 @@ router.get("/:id", async (req, res) => {
       reviews: listOfReviews,
       currentStudentsData: studentData,
       studentLoggedIn: studentLoggedIn,
-      studentReviewLoggedIn: studentReviewLoggedIn
+      studentReviewLoggedIn: studentReviewLoggedIn,
+      adminLoggedIn: adminLoggedIn
     })
   } catch (e) {
     res.status(404).render("error", { error: e });
@@ -201,49 +293,85 @@ router.get("/:id", async (req, res) => {
 });
 
 
-router
-  .route("/add")
-  .get(async (req, res) => {
-    res.render("addCourse");
-  }).post(async (req, res) => {
-    if (!req.session.AuthCookie) {
-      res.status(401).redirect("/courses/admin");
-    } else {
-      const body = req.body;
-      if (!body.name) res.status(400).redirect("/courses/admin");
-      if (!body.courseid) res.status(400).redirect("/courses/admin");
-      if (!body.professorname) res.status(400).redirect("/courses/admin");
-      if (!body.taname) res.status(400).redirect("/courses/admin");
-      if (!body.credits) res.status(400).redirect("/courses/admin");
-      if (!body.professoremail) res.status(400).redirect("/courses/admin");
-      if (!body.taemail) res.status(400).redirect("/courses/admin");
-      try {
-        await courses.addCourseByAdmin(body.name, body.courseid, body.professorname, body.taname, body.credits, body.professoremail, body.taemail, req.session.AuthCookie);
-        res.redirect("/courses");
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  })
 
 router.post("/edit", async (req, res) => {
   const body = req.body;
-  if (!req.session.AuthCookie) {
-    res.status(401).redirect("/students/login");
-  } else if (!body._id) {
-    res.status(400).redirect("/courses/admin")
-  } else if (!courses.checkcourseOwnership(body._id, req.session.AuthCookie)) {
-    res.status(401).redirect("/courses/admin");
-  } else {
-    if (!body.name) res.status(400).redirect("/courses/admin");
-    if (!body.courseId) res.status(400).redirect("/courses/admin");
-    if (!body.professorname) res.status(400).redirect("/courses/admin");
-    if (!body.taname) res.status(400).redirect("/courses/admin");
-    if (!body.credits) res.status(400).redirect("/courses/admin");
-    if (!body.professoremail) res.status(400).redirect("/courses/admin");
-    if (!body.taemail) res.status(400).redirect("/courses/admin");
+  if (!req.session.AuthCookie) res.status(401).redirect("/courses/admin");
+   else {
+      let id = req.body._id;
+      let name = req.body.name;
+      let courseid = req.body.courseid;
+      let professorname = req.body.professorname;
+      let taname = req.body.taname;
+      let credits = Number(req.body.credits);
+      let professoremail = req.body.professoremail;
+      let taemail = req.body.taemail;
+      try {
+        id = await validate.validateId(id, "id");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        name = await validate.validateString(name, "name");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        courseid = await validate.validateString(courseid, "courseid");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        professorname = await validate.validateString(professorname, "professorname");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        credits = await validate.validateNumber(credits, "credits");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        taname = await validate.validateString(taname, "taname");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        professoremail = await validate.validateEmail(professoremail, "professoremail");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
+      try {
+        taemail = await validate.validateEmail(taemail, "taemail");
+      } catch (e) {
+        res.status(400).render("error", {
+          error: e
+        });
+        return;
+      }
     try {
-      await courses.updateCourse(body._id, body.name, body.courseId, body.professorname, body.taname, body.credits, body.professoremail, body.taemail);
+      await courses.updateCourse(name, courseid, credits, professorname, professoremail, taname,  taemail);
     } catch (e) {
       console.log(e);
     }

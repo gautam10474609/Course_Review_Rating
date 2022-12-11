@@ -10,16 +10,16 @@ const main = async () => {
     await db.dropDatabase();
 
     //Seed Sample courses
-    const C1 = await courses.addCourse("Introduction to JAVA Programming", "CS 501", "Peter William", "Sham Shah", 3, "peter@stevens.edu", "sham@stevens.edu");
-    const C2 = await courses.addCourse("Fundamentals of Computing", "CS 515", "Robert Doe", "Rolando Robert", 3, "robert@stevens.edu", "rolando@stevens.edu");
-    const C3 = await courses.addCourse("Computer Organization and Programming", "CS 551", "Jeffer Lyons ", "Parth Kumar", 3, "jeffer@stevens.edu", "parth@stevens.edu");
-    const C4 = await courses.addCourse("Algorithms", "CS 590", "David Jukrat", "Tejas Jain", 3, "pjukrat@stevens.edu", "tejas@stevens.edu");
-    const C5 = await courses.addCourse("Principles of Programming Languages", "CS 510", "Alice Brown", "Aman Malhotra", 3, "alice@stevens.edu", "aman@stevens.edu");
-    const C6 = await courses.addCourse("Compiler Design and Implementation", "CS 516", "Mark Grrenberg", "Willian Watt", 3, "mark@stevens.edu", "william@stevens.edu");
-    const C7 = await courses.addCourse("TCP/IP Networking", "CS 521", "David Thomas", "Karan Jain", 3, "david@stevens.edu", "karan@stevens.edu");
-    const C8 = await courses.addCourse("Enterprise and Cloud Computing", "CS 526", "Felice Smith", "Joseph Witt", 3, "felice@stevens.edu", "joseph@stevens.edu");
-    const C9 = await courses.addCourse("Interactive Computer Graphics", "CS 537", "Zun Ju", "Smitha Patil", 3, "zun@stevens.edu", "smitha@stevens.edu");
-    const C10 = await courses.addCourse("Web Programming", "CS 546", "Patrick Hill", "Aditya Kapoor", 3, "patrick@stevens.edu", "aditya@stevens.edu");
+    const C1 = await courses.addCourse("Introduction to JAVA Programming", "CS 501", 3, "Peter William", "peter@stevens.edu", "Sham Shah",  "sham@stevens.edu");
+    const C2 = await courses.addCourse("Fundamentals of Computing", "CS 515", 3, "Robert Doe", "Rolando Robert", "robert@stevens.edu",  "rolando@stevens.edu");
+    const C3 = await courses.addCourse("Computer Organization and Programming", "CS 551", 3, "Jeffer Lyons ", "jeffer@stevens.edu", "Parth Kumar",   "parth@stevens.edu");
+    const C4 = await courses.addCourse("Algorithms", "CS 590", 3, "David Jukrat", "pjukrat@stevens.edu", "Tejas Jain",   "tejas@stevens.edu");
+    const C5 = await courses.addCourse("Principles of Programming Languages", "CS 510", 3, "Alice Brown", "alice@stevens.edu", "Aman Malhotra",   "aman@stevens.edu");
+    const C6 = await courses.addCourse("Compiler Design and Implementation", "CS 516", 3, "Mark Grrenberg", "mark@stevens.edu", "Willian Watt",   "william@stevens.edu");
+    const C7 = await courses.addCourse("TCP/IP Networking", "CS 521", 3, "David Thomas",  "david@stevens.edu", "Karan Jain",  "karan@stevens.edu");
+    const C8 = await courses.addCourse("Enterprise and Cloud Computing", "CS 526", 3, "Felice Smith", "felice@stevens.edu", "Joseph Witt",   "joseph@stevens.edu");
+    const C9 = await courses.addCourse("Interactive Computer Graphics", "CS 537", 3, "Zun Ju", "zun@stevens.edu", "Smitha Patil",  "smitha@stevens.edu");
+    const C10 = await courses.addCourse("Web Programming", "CS 546", 3, "Patrick Hill",  "patrick@stevens.edu", "Aditya Kapoor", "aditya@stevens.edu");
    
     //Seed Sample Students
     const S1 = await students.addStudents("Donald", "Brown", "donald@stevens.edu", "$2a$16$55b4ftaRCsHZcJ2X3VAmL.X85wi/K3ydOMWRoyafn2ubiA38l4HnK");
