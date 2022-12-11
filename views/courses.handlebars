@@ -9,7 +9,6 @@
             </div>
         </div>
     </div>
-    <div class = "course_Collection"> <!-- Note: When changing this section be sure to modify sort.js as well --> 
     {{#each courses}}
         <div class = "card" onclick="location.href='../courses/{{this._id}}';">
             <h2><a href="/courses/{{this._id}}">{{this.courseId}} {{this.name}}</a></h2>
@@ -25,5 +24,4 @@
         </div>
     {{/each}}
     </div>
-    <script src="/public/javascript/sort.js"></script>
 </main>

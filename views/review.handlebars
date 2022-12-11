@@ -5,7 +5,7 @@
         <p>{{stduent.firstName}} {{student.lastName}}</p>
         <p>Rating: {{review.rating}}/5</p>
         <p>{{review.reviewText}}</p>
-        {{#if isReviewer}}
+        {{#if isStudentReviewer}}
             <p><a href="/reviews/{{id}}/edit">Edit Review</a></p>
         {{/if}}
     </div>

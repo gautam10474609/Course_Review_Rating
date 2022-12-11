@@ -4,20 +4,20 @@ const courses = mongoCollections.courses;
 const students = mongoCollections.students;
 const comments = mongoCollections.comments;
 const validate = require('../helper');
-let { ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 module.exports = {
     async addReview(courseId, studentId, reviewText, rating) {
         id = validate.validateId(studentId, "studentId");
-        if (!ObjectId.isValid(studentId)) throw 'invalid object studentId';
         id = validate.validateId(courseId, "courseId");
-        if (!ObjectId.isValid(courseId)) throw 'invalid object courseId';
         reviewText = validate.validateText(reviewText, "reviewText")
         rating = validate.validateNumber(rating, "rating")
-        if (rating < 1 || rating > 5) 
-            throw "Rating should be between 1 and 5";
+        if (rating < 1 || rating > 5)  throw "Rating should be between 1 and 5";
          
+        const courseCollection = await courses();
         const reviewCollection = await reviews();
+        const studentsCollection = await students();
+        
         let newReviewData = {
             courseId: courseId,
             studentId: studentId,
@@ -32,25 +32,15 @@ module.exports = {
                 studentId: studentId
             }]
         });
-        if (alreadyReviewed) throw "This user already reviewed this course";
-        const insertInfo = await reviewCollection.insertOne(newReviewData);
-        const courseCollection = await courses();
-        const studentsCollection = await students();
-        const _courseId = ObjectId.createFromHexString(courseId);
-        const _studentId = ObjectId.createFromHexString(studentId);
-
+        if (alreadyReviewed) throw "Student already reviewed this course";
         
-        if (insertInfo.insertedCount === 0) {
-            throw 'Could not add new Review';
-        } else {
-            const courseInfo = await courseCollection.updateOne({ _id: _courseId }, { $push: { reviews: newReviewData._id.toString() } });
-            if (courseInfo.modifiedCount === 0) {
-                throw 'Could not update course Collection with Review Data!';
-            }
-            const studentInfo = await studentsCollection.updateOne({ _id: _studentId }, { $push: { reviewIds: newReviewData._id.toString() } });
-            if (studentInfo.modifiedCount === 0) {
-                throw 'Could not update Studentss Collection with Review Data!';
-            }
+        const insertInfo = await reviewCollection.insertOne(newReviewData);
+        if (!insertInfo.acknowledged || !insertInfo.insertedId)throw 'Could not add new Review';
+        else {
+            const courseInfo = await courseCollection.updateOne({ _id: ObjectId.createFromHexString(courseId) }, { $push: { reviews: newReviewData._id.toString() } });
+            if (courseInfo.modifiedCount === 0) throw 'Could not update course Collection with Review Data!';
+            const studentInfo = await studentsCollection.updateOne({ _id: ObjectId.createFromHexString(studentId) }, { $push: { reviewIds: newReviewData._id.toString() } });
+            if (studentInfo.modifiedCount === 0) throw 'Could not update Studentss Collection with Review Data!';
         }
         var newId = String(insertInfo.insertedId);
         const review = await this.getReview(newId);
@@ -58,90 +48,65 @@ module.exports = {
     },
 
     async getReview(id) {
-        if (!id) throw "id must be given";
-        if (typeof(id) === "string") id = ObjectId.createFromHexString(id);
+        id = validate.validateId(id, "id");
         const reviewCollection = await reviews();
-        const review = await reviewCollection.findOne({ _id: id});
-        if (!review) throw "review with that id does not exist";
+        const review = await reviewCollection.findOne({ _id: ObjectId.createFromHexString(id)});
+        if (!review) throw `No review exists with the ${id}`;
         return review;
     },
 
     async getAllReviews() {
         const reviewCollection = await reviews();
         const reviewList = await reviewCollection.find({}).toArray();
-        if (reviewList.length === 0) throw "no reviews in the collection";
+        if (!reviewList) throw "No reviews available";
         return reviewList;
     },
 
-    async updateReview(id, updatedReview) {
-        if (typeof(id) === "string") id = ObjectId.createFromHexString(id);
+    async updateReview(id, reviewText, rating) {
+        id = validate.validateId(id, "review Id");
+        reviewText = validate.validateText(reviewText, "reviewText")
+        rating = validate.validateNumber(rating, "rating")
         const reviewCollection = await reviews();
-        const updatedReviewData = {};
-        if (updatedReview.reviewText) {
-            updatedReviewData.reviewText = updatedReview.reviewText;
-        }
-
-        if (updatedReview.rating) {
-            updatedReviewData.rating = updatedReview.rating;
-        }
-        await reviewCollection.updateOne({_id: id}, {$set: updatedReviewData});
-        return await this.getReview(id);
+        const updatedReview = {};
+        updatedReview.reviewText = reviewText;
+        updatedReview.rating = rating;
+        updateReviewData = await reviewCollection.updateOne({_id: ObjectId.createFromHexString(id)}, {$set: updatedReview});
+        if (!updateReviewData.matchedCount && !updateReviewData.modifiedCount) throw "Update of review failed";
+        return await this.getReview(ObjectId.createFromHexString(id));
     },
 
     async removeReview(id) {
-        if (!id) throw "id must be given";
+        id = validate.validateId(id, "review Id");
         const reviewcollection = await reviews();
-        const { ObjectId } = require('mongodb');
-        const objRevId = ObjectId.createFromHexString(id);
-        const reviewSearch = await reviewcollection.findOne({_id: objRevId});
-        const commentList = reviewSearch.comments;
-        if (reviewSearch === null){
-            throw 'No Review with id - ' + id;
-        }
-        if (commentList.length != 0) {
-            for (var j = 0; j < commentList.length; j++){
+        const commentCollection = await comments();
+        const studentColection = await students();
+        const courseCollection = await courses();
+        const getRev = await reviewcollection.findOne({_id: ObjectId.createFromHexString(id)});
+        const listOFComments = getRev.comments;
+        if (!getRev) throw `No Review with ${id}`;
+        if (!listOFComments) {
+           for(let i in listOFComments)
                 try {
-                    const commentCollection = await comments();
-                    const { ObjectId } = require('mongodb');
-                    const objCommentId = ObjectId.createFromHexString(commentList[j]);
-                    const deletionInfoForComment = await commentCollection.removeOne({_id: objCommentId});
-                
-                    if (deletionInfoForComment.deletedCount === 0) {
-                        throw `Could not delete Comment with id of ${commentList[j]}`;
-                    }
-                } catch (e) {
-                    throw 'Could not Delete Comment while deleting Review!';
-                }
-            }
+                    const deleteCommInfo = await commentCollection.deleteOne({_id: ObjectId.createFromHexString(i)});
+                    if (deleteCommInfo.deletedCount === 0) throw `Could not delete Comment ${i}`;
+                } catch (e){
+                    throw 'Could not delete comment from review';
+                }  
         }
-            try {
-                const userCollection = await students();
-                const { ObjectId } = require('mongodb');
-                const objStudentsId = ObjectId.createFromHexString(reviewSearch.studentId);
-                const deletionInfoForReviewFromStudentss = await userCollection.updateOne({ _id: objStudentsId }, { $pull: { reviewIds: String(id) } });
-                
-                if (deletionInfoForReviewFromStudentss.deletedCount === 0) {
-                    throw `Could not delete Review with id of ${id}`;
-                }
-            } catch (e) {
-                throw "Could not Delete Review from Students while Deleting Review!";
-            }
-            try {
-                const resCollection = await courses();
-                const { ObjectId } = require('mongodb');
-                const objResId = ObjectId.createFromHexString(reviewSearch.courseId);
-                const deletionInfoForReviewFromcourse = await resCollection.updateOne({ _id: objResId }, { $pull: { reviews: String(id) } });
-                
-                if (deletionInfoForReviewFromcourse.deletedCount === 0) {
-                    throw `Could not delete Review with id of ${id}`;
-                }
-            } catch (e) {
-                throw `Could not delete Review from course while Deleting Review!`;
-            }
-            const deletionInfoForReview = await reviewcollection.removeOne({_id: objRevId});
-            if (deletionInfoForReview.deletedCount === 0) {
-                throw `Could not delete Review with id of ${objRevId}`;
-            }
+        try {
+            const deleteRevFromStuInfo = await studentColection.updateOne({ _id: ObjectId.createFromHexString(getRev.studentId) }, { $pull: { reviewIds: String(id) } });
+            if (deleteRevFromStuInfo.deletedCount === 0) throw `Could not delete review ${id}`;
+        } catch (e) {
+            throw "Could not delete review from students";
+        }
+        try { 
+           const deleteReviewFromCourse = await courseCollection.updateOne({ _id: ObjectId.createFromHexString(getRev.courseId) }, { $pull: { reviews: String(id) } });
+            if (deleteReviewFromCourse.deletedCount === 0) throw `Could not delete Review ${id}`;
+        } catch (e) {
+            throw `Could not delete review from course`;
+        }
+        const deleteReviewInfo = await reviewcollection.deleteOne({_id: ObjectId.createFromHexString(id)});
+        if (deleteReviewInfo.deletedCount === 0) throw `Could not delete Review  ${ObjectId.createFromHexString(id)}`;
             return true;
         }
     }
