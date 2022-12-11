@@ -17,7 +17,9 @@
             {{#if studentLoggedIn}}
                 <li><a href="/students/profile" id="profile">Profile</a></li>
                 <li><a href="/students/logout" id ="logout">Logout</a></li>
-            {{else}}
+            {{else if adminLoggedIn}}
+                 <li><a href="/students/logout" id ="logout">Logout</a></li>
+            {{else}} 
                 <li><a href="/students/login" id="auth">Login</a></li>
                 <li><a href="/courses/admin">Admin</a></li>
             {{/if}}

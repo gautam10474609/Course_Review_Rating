@@ -83,6 +83,8 @@
         {{else}}
             <button class="open-button" onclick="openForm()">Add a Review</button>
         {{/if}}
+     {{else if adminLoggedIn}}
+        <button class="open-button" onclick="openCourseEdit()">Edit course</button>
     {{else}}
         <button class="open-button" onclick="openLoginForm()">Add a Review</button>
     {{/if}}

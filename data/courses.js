@@ -4,37 +4,7 @@ const validate = require('../helper');
 const { ObjectId } = require('mongodb');
 
 module.exports = {
-    async addCourse(name, courseId, professorname, taname, credits, professoremail, taemail) {
-        name = await validate.validateName(name, "course Name");
-        courseId = await validate.validateId(courseId, "courseId");
-        professorname = await validate.validateName(professorname, "Profesor Name");
-        taname = await validate.validateName(taname, "TA Name");
-        professoremail = await validate.validateEmail(professoremail, "Professor Email");
-        taemail = await validate.validateEmail(taemail, "TA Email");
-        if (!credits) throw "Credits should not be empty";
-        const courseCollection = await courses();
-        let addNewCourse = {
-            name: name,
-            courseId: courseId,
-            professorname: professorname,
-            taname: taname,
-            credits: credits,
-            professoremail: professoremail,
-            taemail: taemail,
-            admin: "",
-            rating: 0,
-            reviews: [],
-        }
-        const insertInfo = await courseCollection.insertOne(addNewCourse);
-        if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-            throw 'Could not add new course';
-        }
-        const newId = insertInfo.insertedId.toString();
-        const course = await this.getCourse(newId);
-        return course;
-    },
-
-    async addCourseByAdmin(name, courseId, professorname, taname, credits, professoremail, taemail) {
+    async addCourse(name, courseId, credits, professorname, professoremail, taname,  taemail) {
         name = await validate.validateName(name, "course Name");
         courseId = await validate.validateString(courseId, "courseId");
         professorname = await validate.validateName(professorname, "Profesor Name");
@@ -78,7 +48,7 @@ module.exports = {
         return course;
     },
 
-    async updateCourse(id, name, courseId, professorname, taname, credits, professoremail, taemail) {
+    async updateCourse(id, name, courseId, credits, professorname, professoremail, taname, taemail) {
         id = await validate.validateId(id, "id");
         name = await validate.validateName(name, "course Name");
         courseId = await validate.validateId(courseId, "courseId");
