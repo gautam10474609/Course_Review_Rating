@@ -5,8 +5,6 @@ const reviews = mongoCollections.reviews;
 const courses = mongoCollections.courses;
 const students = mongoCollections.students;
 const comments = mongoCollections.comments;
-const commentFunctions = require("./comments")
-// const uuid = require('uuid/v4');
 
 module.exports = {
     async addReview(courseId, studentId, reviewText, rating) {
@@ -15,9 +13,8 @@ module.exports = {
         if (!reviewText || (typeof reviewText != "string")) throw "review text must be given as a string";
         if (!rating || (typeof rating != "number") || (rating < 1) || (rating > 5)) throw "rating must be given as a number from 1 to 5";
          
-        
         const reviewCollection = await reviews();
-        let newReview = {
+        let newReviewData = {
             courseId: courseId,
             studentId: studentId,
             reviewText: reviewText,
@@ -32,34 +29,27 @@ module.exports = {
             }]
         });
         if (alreadyReviewed) throw "This user already reviewed this course";
-        const insertInfo = await reviewCollection.insertOne(newReview);
-        // if (insertInfo.insertedCount === 0) throw "could not add review";
-        
-        const resCollection = await courses();
+        const insertInfo = await reviewCollection.insertOne(newReviewData);
+        const courseCollection = await courses();
         const studentsCollection = await students();
-        const objIdForRes = ObjectId.createFromHexString(courseId);
-        const objIdForStudents = ObjectId.createFromHexString(studentId);
+        const _courseId = ObjectId.createFromHexString(courseId);
+        const _studentId = ObjectId.createFromHexString(studentId);
 
-        // const insertInfo = await commentCollection.insertOne(newAlbum);
         
         if (insertInfo.insertedCount === 0) {
             throw 'Could not add new Review';
         } else {
-            //Add the review id to the course
-            const updatedInfo = await resCollection.updateOne({ _id: objIdForRes }, { $push: { reviews: String(newReview._id) } });
-            if (updatedInfo.modifiedCount === 0) {
+            const courseInfo = await courseCollection.updateOne({ _id: _courseId }, { $push: { reviews: newReviewData._id.toString() } });
+            if (courseInfo.modifiedCount === 0) {
                 throw 'Could not update course Collection with Review Data!';
             }
-            //Add the review id to the user
-            const updatedInfo2 = await studentsCollection.updateOne({ _id: objIdForStudents }, { $push: { reviewIds: String(newReview._id) } });
-            if (updatedInfo2.modifiedCount === 0) {
+            const studentInfo = await studentsCollection.updateOne({ _id: _studentId }, { $push: { reviewIds: newReviewData._id.toString() } });
+            if (studentInfo.modifiedCount === 0) {
                 throw 'Could not update Studentss Collection with Review Data!';
             }
         }
-
-        const newId = insertInfo.insertedId;
-        const newIDString = String(newId);
-        const review = await this.getReview(newIDString);
+        var newId = String(insertInfo.insertedId);
+        const review = await this.getReview(newId);
         return review;
     },
 
@@ -91,7 +81,10 @@ module.exports = {
             updatedReviewData.rating = updatedReview.rating;
         }
 
-       
+        if (updatedReview.reviewPicture) {
+            updatedReviewData.reviewPicture = updatedReview.reviewPicture;
+        }
+        // console.log(updatedReviewData);
         await reviewCollection.updateOne({_id: id}, {$set: updatedReviewData});
         return await this.getReview(id);
     },

@@ -9,6 +9,14 @@ const mongoCollections = require("../config/mongoCollections");
 const cour = mongoCollections.courses;
 const { ObjectId } = require('mongodb');
 
+router.get("/", async (req, res) => {
+    try {
+      return res.redirect("courses");
+    } catch (e) {
+     res.status(404).send();
+    }
+});
+
 router.get("/:id", async (req, res) => {
   let isReviewer = false;
     try {
@@ -25,31 +33,29 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/:id/add", async (req, res) => {
-  const data = req.body;
-  const rating = data.rating;
-  const reviewText = data.reviewText;
+  const rating = req.body.rating;
+  const reviewText = req.body.reviewText;
+  let authCookie = req.session.AuthCookie;
   let hasError = false;
   let error = [];
-  if (rating > 5 || rating < 1) {
-    hasError = true;
-    error.push("Rating must be a number between 1 and 5");
-    let course = await courses.getCourse(req.params.id);
+  if (rating < 1 || rating > 5) {
+      let course = await courses.getCourse(req.params.id);
       let reviewList = [];
       let studentData = {}
-      let userLoggedIn = false;
+      let studentLoggedin = false;
       let loggedInReviewer = false;
       let sumRating = 0;
       let totalRating = 0;
 
-      try { // Get reviews of course
-        for (reviewId of course.reviews) {
+      try {
+        for (let reviewId of course.reviews) {
           review = await reviews.getReview(reviewId);
+          console.log(review)
           commentList = [];
-          //Get Avg
+
           totalRating += 1;
           sumRating += parseInt(review.rating);
         
-          //Rating Updates
           let avgRating = sumRating/totalRating;
           avgRating = avgRating.toFixed(2);
           const courCollection = await cour();
@@ -57,17 +63,16 @@ router.post("/:id/add", async (req, res) => {
           const updated = await courCollection.updateOne({_id: objIdForRes}, {$set: { rating: avgRating}})
           if(!updated.matchedCount && !updated.modifiedCount) res.status(500).json({ message: "Couldn't update rating" });
 
-          try { // Get comments of review
+          try { 
             for (commentId of review.comments) {
               comment = await comments.getComment(commentId);
               comment.student = await students.getStudents(comment.studentId);
-              commentList.push(comment); // This is a simple FIFO - can be improved or filtered in client JS
+              commentList.push(comment);
             }
           } catch (e) {
             console.log(e);
           }
-          review.commentList = commentList; // Add new array inside review object
-          // If this review is by the logged in user, let them edit it from here
+          review.commentList = commentList; 
           if (req.session.AuthCookie === review.studentId) {
             review.isReviewer = true;
             loggedInReviewer = true;
@@ -76,36 +81,29 @@ router.post("/:id/add", async (req, res) => {
             loggedInReviewer = false;
           }
           review.student = await students.getStudents(review.studentId);
-          reviewList.push(review); // This is a simple FIFO - can be improved or filtered in client JS
+          reviewList.push(review); 
 
         }
       } catch (e) {
         console.log(e);
       }
 
-      let studentId = req.session.AuthCookie;
-      if(!studentId) {
-        userLoggedIn = false;
+     
+      if(authCookie) {
+        studentLoggedin = true;
+        studentData = await students.getStudents(authCookie);
+        studentData.reviewedcoursePage = reviewList.some(item => item.authCookie === String(studentData._id));
       } else {
-        userLoggedIn = true;
-        studentData = await students.getStudents(studentId);
-        studentData.reviewedcoursePage = reviewList.some(item => item.studentId === String(studentData._id));
+        studentLoggedin = false;
       }
-    return res.status(403).render("course", { course: course, reviews: reviewList, userLoggedIn: userLoggedIn, loggedInReviewer: loggedInReviewer, currentStudentsData: studentData, hasError: hasError, error: error});
+    return res.status(403).render("course", { course: course, reviews: reviewList, studentLoggedin: studentLoggedin, loggedInReviewer: loggedInReviewer, currentStudentsData: studentData, hasError: hasError, error: error});
   }
   try {
-    const reviewRating = req.body.rating;
-    const reviewText = req.body.reviewText;
-    
-    
-    let studentId = req.session.AuthCookie;
     let courseID = req.params.id;
-    const reviewForRes = await reviews.addReview(courseID, studentId, reviewText, Number(reviewRating));
-    console.log(reviewForRes);
+    const reviewForRes = await reviews.addReview(courseID, authCookie, reviewText, Number(rating));
     const redirectURL = "/courses/" + courseID;
     return res.redirect(redirectURL);
   } catch (e) {
-    // Something went wrong with the server!
     res.status(404).send();
   }
 });
@@ -115,8 +113,7 @@ router.get("/", async (req, res) => {
     try {
       return res.redirect("courses");
     } catch (e) {
-      // Something went wrong with the server!
-      res.status(404).send();
+     res.status(404).send();
     }
 });
 
@@ -126,16 +123,15 @@ router.get("/:id/edit", async (req, res) => {
     if (req.session.AuthCookie != review.studentId) {
       return res.redirect("/reviews");
     } else {
-      res.status(200).render("editReview", {reviewId: req.params.id, reviewText: review.reviewText, rating: review.rating, userLoggedIn: true});
+      res.status(200).render("editReview", {reviewId: req.params.id, reviewText: review.reviewText, rating: review.rating, studentLoggedin: true});
     }} catch (e) {
       res.status(404).json({ message: "review not found" });
     }
 });
 
 router.post("/:id/edit",  async (req, res) => {
-  const data = req.body;
-  const rating = data.rating;
-  const reviewText = data.reviewText;
+  const rating = req.body.rating;
+  const reviewText = req.body.reviewText;
   let editedReview = {};
   let hasError = false;
   let error = [];
@@ -143,7 +139,7 @@ router.post("/:id/edit",  async (req, res) => {
   if (rating > 5 || rating < 1) {
     hasError = true;
     error.push("Rating must be a number between 1 and 5");
-    return res.status(403).render("editReview", {reviewId: req.params.id, reviewText: reviewText, rating: rating, hasError: hasError, error: error, userLoggedIn: true});
+    return res.status(403).render("editReview", {reviewId: req.params.id, reviewText: reviewText, rating: rating, hasError: hasError, error: error, studentLoggedin: true});
   }
   try {
     if(!req.file){
@@ -166,7 +162,7 @@ router.post("/:id/edit",  async (req, res) => {
     if(req.session.AuthCookie === review.studentId) {
       isReviewer = true;
     }
-    return res.status(200).render("review", { review: updatedReview, student: student, course: course, isReviewer: isReviewer, id: req.params.id, userLoggedIn: true});
+    return res.status(200).render("review", { review: updatedReview, student: student, course: course, isReviewer: isReviewer, id: req.params.id, studentLoggedin: true});
   } catch (e) {
     console.log(e);
     res.status(404).json ({message: "could not update review"});
@@ -174,27 +170,28 @@ router.post("/:id/edit",  async (req, res) => {
 });
 
 router.get('/:courseId/:reviewId/delete', async (req, res) => {
-	if (!req.params.reviewId) {
-		res.status(400).json({ error: 'You must Supply an ID to delete' });
-		return;
-	}
-	try {
-		await reviews.getReview(req.params.reviewId);
-	} catch (e) {
-		res.status(404).json({ error: 'Review not found!' });
-		return;
-	}
-	try {
+  if (!req.params.reviewId) {
+    res.status(400).json({ error: 'You must Supply an ID to delete' });
+    return;
+  }
+  try {
+    await reviews.getReview(req.params.reviewId);
+  } catch (e) {
+    res.status(404).json({ error: 'Review not found!' });
+    return;
+  }
+  try {
     deleteReviewWithComments = await reviews.removeReview(req.params.reviewId);
     if(deleteReviewWithComments){
       return res.redirect("/courses/" + req.params.courseId);
     } else {
       return res.status(404).send();
     }
-		//res.json({deleted: true, data: toBeDeletedReview});
-	} catch (e) {
-		res.status(500).json({ error: e });
-	}
+    //res.json({deleted: true, data: toBeDeletedReview});
+  } catch (e) {
+    res.status(500).json({ error: e });
+  }
 });
 
 module.exports = router;
+
