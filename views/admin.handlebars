@@ -1,16 +1,25 @@
-<div class="card-center">
-    <h1>Add course as Admin</h1>
-    <form class="form-container" method="POST" action="/courses/add">
-    <div>
-        <input type="text" name="name" placeholder="course Name" class="inputFields" />
+<main>
+    <h1>Login to add new course</h1>
+    <div class="loginPage" id="adminlogin-details">
+        <h2>Login</h2>
+        <form id="adminlogin-form" name="adminloginForm" action="/courses/admin" method="POST">
+            <label>
+                <input type="text" class="adminloginInput" name="email" id="email" placeholder="Enter your Email" />
+                <span id="emailError" class="error"></span>
+            </label>
+            <label>
+                <input type="password" class="adminloginInput" name="password" id="password"
+                    placeholder="Enter your Password" />
+                <span id="passwordError" class="error"></span>
+            </label>
+            <button type="submit" class="btn">Login</button>
+            {{#if error}}
+            <p class="error-msg">{{error}}</p>
+            {{/if}}
+        </form>
     </div>
-    <input type="submit" value="Add course" class="btn" />
-    </form>
-</div>
-<div class="card-center">
-    <h1>admin Owned courses</h1>
-    <p>(Click links to edit)</p>
-    {{#each courses}}
-        <p><a href="/courses/edit/{{this._id}}">{{this.name}}</p></a>
-    {{/each}}
-</div>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous">
+        </script>
+    <script src="/public/javascript/admin.js"></script>
+</main>

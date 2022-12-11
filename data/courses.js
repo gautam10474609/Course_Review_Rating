@@ -1,16 +1,16 @@
 const mongoCollections = require("../config/mongoCollections");
 const courses = mongoCollections.courses;
 const validate = require('../helper');
-let { ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 module.exports = {
     async addCourse(name, courseId, professorname, taname, credits, professoremail, taemail) {
-        name = validate.validateName(name, "course Name");
-        courseId = validate.validateEmail(courseId, "courseId");
-        professorname = validate.validateName(professorname, "Profesor Name");
-        taname = validate.validateName(taname, "TA Name");
-        professoremail = validate.validateEmail(professoremail, "Professor Email");
-        taemail = validate.validateEmail(taemail, "TA Email");
+        name = await validate.validateName(name, "course Name");
+        courseId = await validate.validateId(courseId, "courseId");
+        professorname = await validate.validateName(professorname, "Profesor Name");
+        taname = await validate.validateName(taname, "TA Name");
+        professoremail = await validate.validateEmail(professoremail, "Professor Email");
+        taemail = await validate.validateEmail(taemail, "TA Email");
         if (!credits) throw "Credits should not be empty";
         const courseCollection = await courses();
         let addNewCourse = {
@@ -34,16 +34,14 @@ module.exports = {
         return course;
     },
 
-    async addCourseByAdmin(name, courseId, professorname, taname, credits, professoremail, taemail, admin) {
-        name = validate.validateName(name, "course Name");
-        courseId = validate.validateEmail(courseId, "courseId");
-        professorname = validate.validateName(professorname, "Profesor Name");
-        taname = validate.validateName(taname, "TA Name");
-        professoremail = validate.validateEmail(professoremail, "Professor Email");
-        taemail = validate.validateEmail(taemail, "TA Email");
+    async addCourseByAdmin(name, courseId, professorname, taname, credits, professoremail, taemail) {
+        name = await validate.validateName(name, "course Name");
+        courseId = await validate.validateString(courseId, "courseId");
+        professorname = await validate.validateName(professorname, "Profesor Name");
+        taname = await validate.validateName(taname, "TA Name");
+        professoremail = await validate.validateEmail(professoremail, "Professor Email");
+        taemail = await validate.validateEmail(taemail, "TA Email");
         if (!credits) throw "Credits should not be empty";
-        if (!admin || typeof admin !== "string") throw "Admin should not be empty";
-        admin = ObjectId.createFromHexString(admin);
         const courseCollection = await courses();
         let addNewCoursebyAdmin = {
             name: name,
@@ -53,7 +51,6 @@ module.exports = {
             credits: credits,
             professoremail: professoremail,
             taemail: taemail,
-            admin: admin,
             rating: 0,
             reviews: [],
         }
@@ -74,8 +71,7 @@ module.exports = {
     },
 
     async getCourse(id) {
-        id = validate.validateId(id);
-        if (!ObjectId.isValid(id)) throw 'invalid object id';
+        id = await validate.validateId(id);
         const courseCollection = await courses();
         const course = await courseCollection.findOne({ _id: ObjectId(id) });
         if (!course) throw `No course exists with the ${id}`;
@@ -83,14 +79,13 @@ module.exports = {
     },
 
     async updateCourse(id, name, courseId, professorname, taname, credits, professoremail, taemail) {
-        id = validate.validateId(id, "id");
-        if (!ObjectId.isValid(id)) throw 'invalid object id';
-        name = validate.validateName(name, "course Name");
-        courseId = validate.validateEmail(courseId, "courseId");
-        professorname = validate.validateName(professorname, "Profesor Name");
-        taname = validate.validateName(taname, "TA Name");
-        professoremail = validate.validateEmail(professoremail, "Professor Email");
-        taemail = validate.validateEmail(taemail, "TA Email");
+        id = await validate.validateId(id, "id");
+        name = await validate.validateName(name, "course Name");
+        courseId = await validate.validateId(courseId, "courseId");
+        professorname = await validate.validateName(professorname, "Profesor Name");
+        taname = await validate.validateName(taname, "TA Name");
+        professoremail = await validate.validateEmail(professoremail, "Professor Email");
+        taemail = await validate.validateEmail(taemail, "TA Email");
         if (!credits) throw "Credits should not be empty";
         const courseCollection = await courses();
         let updatedCourse = {
@@ -114,5 +109,14 @@ module.exports = {
         const regSearch = new RegExp(search, "i");
         const allCourses = await courseCollection.find({ name: { $regex: regSearch } }).toArray();;
         return allCourses;
-    }
+    },
+    async checkAdmin(email, password) {
+        email = validate.validateEmail(email, "Email");
+        password = validate.validatePassword(password);
+        email = email.toLowerCase();
+        if (email === "admin@gmail.com" && password === "Admin@123") { 
+            return { insertedAdmin: true };
+        } else
+        throw "Either the email or password is invalid";
+    },
 }

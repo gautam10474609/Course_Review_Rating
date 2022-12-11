@@ -1,18 +1,20 @@
+const { ObjectId } = require('mongodb');
 const emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
 const regex = new RegExp('^[A-Za-z0-9]+$');
 const passwordRegex = new RegExp('^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$')
   
 let validateId = (id, tex) => {
-  if (!id) throw `${tex} provide valide id`;
+  if (!id) throw `${tex} provide valid id`;
   if (typeof id !== 'string') throw `${tex} should be a string`;
   if (id.trim().length === 0) throw `${tex} cannot be empty or space`;
   id = id.trim();
+  if (!ObjectId.isValid(id)) throw 'invalid object id';
   return id
 }; 
 
 
 let validateText = (textData, tex) => {
-  if (!textData) throw `${tex} provide valide input data`;
+  if (!textData) throw `${tex} provide valid input data`;
   if (typeof textData !== 'string') throw `${tex} data should be a string`;
   if (textData.trim().length === 0) throw `${tex} cannot be empty or space`;
   textData = textData.trim();

@@ -2,16 +2,14 @@ const mongoCollections = require("../config/mongoCollections");
 const comments = mongoCollections.comments;
 const reviews = mongoCollections.reviews;
 const validate = require('../helper');
-let { ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 
 module.exports = {
     async addComment(studentId, reviewId, commentInput) {
-        id = validate.validateId(studentId, "studentId");
-        if (!ObjectId.isValid(studentId)) throw 'invalid object studentId';
-        id = validate.validateId(reviewId, "validateId");
-        if (!ObjectId.isValid(reviewId)) throw 'invalid object reviewId';
-        commentInput = validate.validateText(commentInput, "commentInput")
+        id = await validate.validateId(studentId, "studentId");
+        id = await validate.validateId(reviewId, "validateId");
+        commentInput = await  validate.validateText(commentInput, "commentInput")
 
         const commentCollection = await comments();
         let addNewComment = {
@@ -42,8 +40,7 @@ module.exports = {
     },
 
     async getComment(id) {
-        id = validate.validateId(id, "commentId");
-        if (!ObjectId.isValid(id)) throw 'invalid object commentid';
+        id = await validate.validateId(id, "commentId");
         const commentCollection = await comments();
         const comment = await commentCollection.findOne({ _id: ObjectId(id) });
         if (!comment) throw `No comment exists with the ${id}`;
@@ -51,8 +48,7 @@ module.exports = {
     },
 
     async removeComment(id) {
-        id = validate.validateId(id, "commentId");
-        if (!ObjectId.isValid(id)) throw 'invalid object commentid';
+        id = await validate.validateId(id, "commentId");
         const commentCollection = await comments();
         let comment = await this.getComment(id);
         const deleteInfo = await commentCollection.deleteOne({ _id: ObjectId(id) });
@@ -73,9 +69,8 @@ module.exports = {
     },
 
     async updateComment(id, commentText) {
-        id = validate.validateId(id, "commentId");
-        if (!ObjectId.isValid(id)) throw 'invalid object commentid';
-        commentInput = validate.validateText(commentInput, "commentInput")
+        id = await validate.validateId(id, "commentId");
+        commentInput = await validate.validateText(commentInput, "commentInput")
         const updateCommentData = {};
         updateCommentData.commentText = commentText;
         const commentCollection = await comments();

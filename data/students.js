@@ -3,8 +3,7 @@ const students = mongoCollections.students;
 const bcrypt = require("bcryptjs");
 const validate = require('../helper');
 const saltRounds = 16;
-let { ObjectId } = require('mongodb');
-
+const { ObjectId } = require('mongodb');
 
 module.exports = {
     async addStudents(firstName, lastName, email, password) {
@@ -26,7 +25,7 @@ module.exports = {
                 commentIds: []
             }
             const insertInfo = await studentCollection.insertOne(newStudents);
-            if (insertInfo.insertedCount === 0) throw "Not able to add new student";
+            if (!insertInfo.acknowledged || !insertInfo.insertedId) throw "Not able to add new student";
              return await this.getStudents(insertInfo.insertedId.toString());
         } else
             throw "Please try with other email. This email is already registered.";
@@ -40,8 +39,7 @@ module.exports = {
     },
 
     async getStudents(id) {
-         id = validate.validateId(id, "Student Id");
-         if (!ObjectId.isValid(id)) throw 'Object id is not valid';
+        id = validate.validateId(id, "Student Id");
         const studentCollection = await students();
         const student = await studentCollection.findOne({ _id: ObjectId(id) });
         if (!student) throw "Student with the id does not exists";
@@ -57,8 +55,8 @@ module.exports = {
     },
 
     async checkStudent(email, password) {
-         email = validate.validateEmail(email, "Email");
-         password = validate.validatePassword(password);
+        email = validate.validateEmail(email, "Email");
+        password = validate.validatePassword(password);
         const studentCollection = await students();
         email = email.toLowerCase();
         const student = await studentCollection.findOne({ email: email });

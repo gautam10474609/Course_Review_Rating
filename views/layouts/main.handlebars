@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Course Review Rating</title>
-    <link rel="icon" type="image/png" sizes="16x16" href="../../public/images/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../../public/images/favicon.jpeg">
 
     <link rel="stylesheet" type="text/css" href="../../public/css/style.css">
     <link href="https://fonts.googleapis.com/css?family=Monstserrat|Mukta&amp;display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
         <nav>
             <li><a href="/">Home</a></li>
             <li><a href="/courses">Courses</a></li>
-            {{#if userLoggedIn}}
+            {{#if studentLoggedIn}}
                 <li><a href="/students/profile" id="profile">Profile</a></li>
                 <li><a href="/students/logout" id ="logout">Logout</a></li>
             {{else}}

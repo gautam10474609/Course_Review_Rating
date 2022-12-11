@@ -10,14 +10,14 @@ const constructorMethod = app => {
   app.use("/students", students);
   
   app.get("/", (req, res) => {
-    let userLoggedIn = false;
-    let authCookie = req.session.AuthCookie;
-    if(!authCookie) {
-      userLoggedIn = false;
+    let studentLoggedIn = false;
+    let studentId = req.session.AuthCookie;
+    if(!studentId) {
+      studentLoggedIn = false;
     } else {
-      userLoggedIn = true;
+      studentLoggedIn = true;
     }
-    res.status(200).render("index", {userLoggedIn: userLoggedIn});
+    res.status(200).render("index", {studentLoggedIn: studentLoggedIn});
   });
 
   app.use('*', (req, res) => {

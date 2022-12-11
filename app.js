@@ -6,10 +6,6 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const configRoutes = require('./routes');
 const static = express.static(__dirname + '/public');
-const studData = require("./data/studentData");
-const bodyParser = require("body-parser");
-const bcrypt = require('bcryptjs');
-const data = require("./students");
 
 app.use(cookieParser());
 app.use(cors());
@@ -29,7 +25,6 @@ app.use(
 app.engine('handlebars', exphbs.engine());
 app.set('view engine', 'handlebars');
 
-var auth = "Not Authenticated"
 
 app.use(function(request, response, next) {
   console.log('Timestamp ' + new Date().toUTCString());
@@ -54,10 +49,10 @@ app.use(function(request, response, next) {
 
 app.use("/profile", function(req, res, next){
     if(!req.session.AuthCookie) {
-      let hasErrors = true;
+      let isErrors = true;
       let errors = [];
       errors.push("Not Logged In, Please Login");
-      res.status(403).render("layouts/main", {hasErrors:hasErrors, errors: errors});
+      res.status(403).render("layouts/main", {isErrors:isErrors, errors: errors});
     } else {
       next();
     }
