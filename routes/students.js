@@ -7,6 +7,14 @@ const courses = data.courses;
 const reviews = data.reviews;
 const xss = require('xss');
 
+router
+  .route('/logout')
+  .get(async (req, res) => {
+    res.clearCookie("AuthCookie");
+    req.session.destroy();
+    res.status(200).render("login");
+    return;
+  })
 router.get("/", async (req, res) => {
   try {
     const studentList = await students.getAllStudents();
@@ -207,20 +215,10 @@ router.get("/:id", async (req, res) => {
         studentLoggedIn: studentLoggedIn
       });
     } catch (e) {
-      console.log(e);
       res.status(404).render("error", {
          error: e 
         });
     }
 });
-
-router
-  .route('/logout')
-  .get(async (req, res) => {
-    res.clearCookie("AuthCookie");
-    req.session.destroy();
-    res.status(200).render("login");
-    return;
-  })
 
 module.exports = router;

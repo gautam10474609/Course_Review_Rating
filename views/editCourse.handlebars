@@ -1,8 +1,13 @@
 <div class="card-center">
     <h3>Edit course</h3>
-    <form method="POST" action="/courses/edit/">
-        <input type="text" name="_id" placeholder="course ID" value="{{course._id}}" class="inputFields" readonly />
-        <input type="text" name="name" placeholder="course Name" value="{{course.name}}" class="inputFields" />
-       <input type="submit" value="Edit course" class="btn" />
+    <form method="POST" action="/courses/edit">
+       <input type="text" name="name" placeholder="course Name" class="inputFields" />
+        <input type="text" name="courseid" placeholder="course Id" class="inputFields" />
+        <input type="text" name="credits" placeholder="course credits" class="inputFields" />
+        <input type="text" name="professorname" placeholder="Professor Name"  class="inputFields" />
+        <input type="text" name="professoremail" placeholder="Professor email"  class="inputFields" />
+        <input type="text" name="taname" placeholder="Ta Name"  class="inputFields" />
+        <input type="text" name="taemail" placeholder="Ta Email"  class="inputFields" />
+       <input type="submit" value="Edit Course" class="btn" />
     </form>
 </div>

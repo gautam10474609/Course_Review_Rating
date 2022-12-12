@@ -3,6 +3,9 @@
     <div class="card-wide" id="right">
         <h2>Edit Review</h2>
         <form if="edit-review" action="/reviews/{{reviewId}}/edit" enctype="multipart/form-data" method="post">
+            <label for="semsterVal"><h4>Semster</h4>
+                <input type="number" id="semsterVal" name="semsterVal" value={{semsterVal}} class="inputFields" readonly>
+            </label>
             <label for="rating"><h4>Rating</h4>
                 <input type="number" id="rating" name="rating" value={{rating}} class="inputFields">
             </label>
