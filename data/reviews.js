@@ -7,12 +7,13 @@ const validate = require('../helper');
 const { ObjectId } = require('mongodb');
 
 module.exports = {
-    async addReview(courseId, studentId, reviewText, rating) {
+    async addReview(courseId, studentId, semesterVal, reviewText, rating) {
         id = validate.validateId(studentId, "studentId");
         id = validate.validateId(courseId, "courseId");
-        reviewText = validate.validateText(reviewText, "reviewText")
+        reviewText = validate.validateString(reviewText, "review Text")
         rating = validate.validateNumber(rating, "rating")
-        if (rating < 1 || rating > 5)  throw "Rating should be between 1 and 5";
+        semesterVal = validate.validateString(semesterVal, "semester")
+        if (rating < 1 || rating > 5)  throw "Please choose between 1 and 5";
          
         const courseCollection = await courses();
         const reviewCollection = await reviews();
@@ -21,6 +22,7 @@ module.exports = {
         let newReviewData = {
             courseId: courseId,
             studentId: studentId,
+            semesterVal: semesterVal,
             reviewText: reviewText,
             rating: rating,
             comments: []
@@ -37,9 +39,19 @@ module.exports = {
         const insertInfo = await reviewCollection.insertOne(newReviewData);
         if (!insertInfo.acknowledged || !insertInfo.insertedId)throw 'Could not add new Review';
         else {
-            const courseInfo = await courseCollection.updateOne({ _id: ObjectId.createFromHexString(courseId) }, { $push: { reviews: newReviewData._id.toString() } });
+            const courseInfo = await courseCollection.updateOne({ 
+                _id: ObjectId(courseId) 
+            }, { 
+                $push: { reviews: newReviewData._id.toString() 
+                } 
+            });
             if (courseInfo.modifiedCount === 0) throw 'Could not update course Collection with Review Data!';
-            const studentInfo = await studentsCollection.updateOne({ _id: ObjectId.createFromHexString(studentId) }, { $push: { reviewIds: newReviewData._id.toString() } });
+            const studentInfo = await studentsCollection.updateOne({
+                 _id: ObjectId(studentId) 
+                }, { 
+                    $push: { reviewIds: newReviewData._id.toString() 
+                    } 
+                });
             if (studentInfo.modifiedCount === 0) throw 'Could not update Studentss Collection with Review Data!';
         }
         var newId = String(insertInfo.insertedId);
@@ -50,7 +62,9 @@ module.exports = {
     async getReview(id) {
         id = validate.validateId(id, "id");
         const reviewCollection = await reviews();
-        const review = await reviewCollection.findOne({ _id: ObjectId.createFromHexString(id)});
+        const review = await reviewCollection.findOne({ 
+            _id: ObjectId(id)
+        });
         if (!review) throw `No review exists with the ${id}`;
         return review;
     },
@@ -62,17 +76,24 @@ module.exports = {
         return reviewList;
     },
 
-    async updateReview(id, reviewText, rating) {
+    async updateReview(id,  semesterVal, reviewText, rating) {
         id = validate.validateId(id, "review Id");
-        reviewText = validate.validateText(reviewText, "reviewText")
+        reviewText = validate.validateString(reviewText, "reviewText")
+        semesterVal = validate.validateString(semesterVal, "semester Val")
         rating = validate.validateNumber(rating, "rating")
+        if (rating < 1 || rating > 5)  throw "Please choose between 1 and 5";
         const reviewCollection = await reviews();
         const updatedReview = {};
+        updatedReview.semesterVal = semesterVal;
         updatedReview.reviewText = reviewText;
         updatedReview.rating = rating;
-        updateReviewData = await reviewCollection.updateOne({_id: ObjectId.createFromHexString(id)}, {$set: updatedReview});
+        updateReviewData = await reviewCollection.updateOne({
+            _id: ObjectId(id)
+        }, {
+            $set: updatedReview
+        });
         if (!updateReviewData.matchedCount && !updateReviewData.modifiedCount) throw "Update of review failed";
-        return await this.getReview(ObjectId.createFromHexString(id));
+        return await this.getReview(ObjectId(id));
     },
 
     async removeReview(id) {
@@ -81,32 +102,46 @@ module.exports = {
         const commentCollection = await comments();
         const studentColection = await students();
         const courseCollection = await courses();
-        const getRev = await reviewcollection.findOne({_id: ObjectId.createFromHexString(id)});
+        const getRev = await reviewcollection.findOne({_id: ObjectId(id)});
         const listOFComments = getRev.comments;
         if (!getRev) throw `No Review with ${id}`;
         if (!listOFComments) {
            for(let i in listOFComments)
                 try {
-                    const deleteCommInfo = await commentCollection.deleteOne({_id: ObjectId.createFromHexString(i)});
+                    const deleteCommInfo = await commentCollection.deleteOne({
+                        _id: ObjectId(i)
+                    });
                     if (deleteCommInfo.deletedCount === 0) throw `Could not delete Comment ${i}`;
                 } catch (e){
                     throw 'Could not delete comment from review';
                 }  
         }
         try {
-            const deleteRevFromStuInfo = await studentColection.updateOne({ _id: ObjectId.createFromHexString(getRev.studentId) }, { $pull: { reviewIds: String(id) } });
+            const deleteRevFromStuInfo = await studentColection.updateOne({
+                 _id: ObjectId(getRev.studentId) 
+                }, { 
+                    $pull: { reviewIds: String(id) 
+                    } 
+                });
             if (deleteRevFromStuInfo.deletedCount === 0) throw `Could not delete review ${id}`;
         } catch (e) {
             throw "Could not delete review from students";
         }
         try { 
-           const deleteReviewFromCourse = await courseCollection.updateOne({ _id: ObjectId.createFromHexString(getRev.courseId) }, { $pull: { reviews: String(id) } });
+           const deleteReviewFromCourse = await courseCollection.updateOne({
+                _id: ObjectId(getRev.courseId) 
+            }, { 
+                $pull: { reviews: String(id) 
+                } 
+            });
             if (deleteReviewFromCourse.deletedCount === 0) throw `Could not delete Review ${id}`;
         } catch (e) {
             throw `Could not delete review from course`;
         }
-        const deleteReviewInfo = await reviewcollection.deleteOne({_id: ObjectId.createFromHexString(id)});
-        if (deleteReviewInfo.deletedCount === 0) throw `Could not delete Review  ${ObjectId.createFromHexString(id)}`;
+        const deleteReviewInfo = await reviewcollection.deleteOne({
+            _id: ObjectId(id)
+        });
+        if (deleteReviewInfo.deletedCount === 0) throw `Could not delete Review  ${ObjectId(id)}`;
             return true;
         }
     }

@@ -55,6 +55,7 @@ router.post("/:id/add", async (req, res) => {
   let id = req.params.id;
   let rating = Number(req.body.rating);
   let reviewText = req.body.reviewText;
+  let semesterVal =  req.body.selectSemester
   let studentId = req.session.AuthCookie;
     try{
       id = await validate.validateId(id, "id");
@@ -73,6 +74,14 @@ router.post("/:id/add", async (req, res) => {
       return;
     }
     try{
+      semesterVal = validate.validateString(semesterVal, "semester");
+    } catch (e) {
+      res.status(400).render("error", { 
+        error: e
+       });
+      return;
+    }
+    try{
       reviewText = await validate.validateString(reviewText, "reviewText");
     } catch (e) {
       res.status(400).render("error", { 
@@ -81,7 +90,7 @@ router.post("/:id/add", async (req, res) => {
       return;
     }
   try {
-    await reviews.addReview(id, studentId, reviewText, rating);
+    await reviews.addReview(id, studentId, semesterVal, reviewText, rating);
     return res.redirect("/courses/" + id);
   } catch (e) {
     res.status(404).render("error", { 
@@ -175,10 +184,10 @@ router.route("/:id/edit").get(async (req, res) => {
   }
   
   try {
-    const review = await reviews.getReview(req.params.id);
+    const review = await reviews.getReview(id);
     const student = await students.getStudents(review.studentId);
     const course = await courses.getCourse(review.courseId);
-    const updatedReview = await reviews.updateReview(req.params.id, rating, reviewText);
+    const updatedReview = await reviews.updateReview(id, semesterVal, rating, reviewText);
     if(studentId === review.studentId) {
       isStudentReviewer = true;
     }
@@ -187,7 +196,7 @@ router.route("/:id/edit").get(async (req, res) => {
       student: student, 
       course: course, 
       isStudentReviewer: isStudentReviewer, 
-      id: req.params.id, 
+      id: id, 
       studentLoggedin: true
     });
   } catch (e) {

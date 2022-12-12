@@ -9,13 +9,13 @@ module.exports = {
     async addComment(studentId, reviewId, commentInput) {
         id = await validate.validateId(studentId, "studentId");
         id = await validate.validateId(reviewId, "validateId");
-        commentInput = await  validate.validateText(commentInput, "commentInput")
+        commentInput = await  validate.validateString(commentInput, "commentInput")
 
         const commentCollection = await comments();
         let addNewComment = {
             studentId: studentId,
             reviewId: reviewId,
-            commentText: commentText
+            commentInput: commentInput
         }
         const insertInfo = await commentCollection.insertOne(addNewComment);
         const reviewCollection = await reviews();
@@ -23,7 +23,12 @@ module.exports = {
         if (!insertInfo.acknowledged || !insertInfo.insertedId) {
             throw 'Could not add new Review';
         } else {
-            const updatedInfo = await reviewCollection.updateOne({ _id: ObjectId.createFromHexString(reviewId) }, { $push: { comments: addNewComment._id.toString() } });
+            const updatedInfo = await reviewCollection.updateOne({ 
+                _id: ObjectId(reviewId) 
+            }, { $push: 
+                { comments: addNewComment._id.toString()
+                } 
+            });
             if (!updatedInfo.matchedCount && !updatedInfo.modifiedCount) {
                 throw 'Could not update Review Collection with Review Data!';
             }
@@ -57,7 +62,12 @@ module.exports = {
         }
         try {
             const reviewCollection = await reviews();
-            const deletionInfoForCommentFromReview = await reviewCollection.updateOne({ _id: ObjectId.createFromHexString(comment.reviewId) }, { $pull: { comments: id.toString() } });
+            const deletionInfoForCommentFromReview = await reviewCollection.updateOne({ 
+                _id: ObjectId(comment.reviewId) 
+            }, { 
+                    $pull: { comments: id.toString() 
+                    }
+                 });
 
             if (deletionInfoForCommentFromReview.deletedCount === 0) {
                 throw `Could not delete Comment ${id}`;
@@ -70,11 +80,16 @@ module.exports = {
 
     async updateComment(id, commentText) {
         id = await validate.validateId(id, "commentId");
-        commentInput = await validate.validateText(commentInput, "commentInput")
+        commentInput = await validate.validateString(commentInput, "commentInput")
         const updateCommentData = {};
         updateCommentData.commentText = commentText;
         const commentCollection = await comments();
-        const updateCommentInfo = await commentCollection.updateOne({ _id: ObjectId.createFromHexString(id) }, { $set: updateCommentData });
+        const updateCommentInfo = await commentCollection.updateOne({ 
+            _id: ObjectId(id) 
+        }, 
+            { 
+                $set: updateCommentData 
+            });
         if (!updateCommentInfo.modifiedCount) throw "Could not update Comment";
         return await this.getComment(id);
     }

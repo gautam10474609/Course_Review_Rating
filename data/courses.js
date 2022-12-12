@@ -67,9 +67,13 @@ module.exports = {
             professoremail: professoremail,
             taemail: taemail
         }
-        const updateInfo = await courseCollection.updateOne({ _id: ObjectId.createFromHexString(id) }, { $set: updatedCourse });
+        const updateInfo = await courseCollection.updateOne({ 
+            _id: ObjectId(id) 
+        }, {
+             $set: updatedCourse 
+            });
         if (!updateInfo.modifiedCount) throw "Could not update course";
-        const course = await this.getCourse(ObjectId.createFromHexString(id));
+        const course = await this.getCourse(ObjectId(id));
         return course;
     },
 

@@ -11,8 +11,8 @@
     </div>
     {{#each courses}}
         <div class = "card" onclick="location.href='../courses/{{this._id}}';">
-            <h2><a href="/courses/{{this._id}}">{{this.courseId}} {{this.name}}</a></h2>
-            <p>{{this.credits}}</p>
+            <h2><a href="/courses/{{this._id}}">{{this.courseId}} {{this.name}} </a></h2>
+            <p>credits: {{this.credits}}</p>
             <p>Professor: {{this.professorname}},  Email:{{this.professoremail}} </p>
             <p>TA: {{this.taname}},  Email: {{this.taemail}}</p>  
             {{#if this.rated}}  

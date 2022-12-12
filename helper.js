@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 const emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
-const regex = new RegExp('^[A-Za-z0-9]+$');
+const regex = new RegExp('([A-Za-z0-9  ])\w+');
 const passwordRegex = new RegExp('^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$')
   
 let validateId = (id, tex) => {
@@ -12,22 +12,11 @@ let validateId = (id, tex) => {
   return id
 }; 
 
-
-let validateText = (textData, tex) => {
-  if (!textData) throw `${tex} provide valid input data`;
-  if (typeof textData !== 'string') throw `${tex} data should be a string`;
-  if (textData.trim().length === 0) throw `${tex} cannot be empty or space`;
-  textData = textData.trim();
-  return textData
-};
-
-
 let validateName = (name, nameString) => {
   if (!name) throw `${nameString} should not be empty`;
   if (typeof name !== "string") throw `${nameString} is not a string`;
   name = name.trim();
   if (name === "") throw `${nameString} cannot be blank spaces`;
-  if (!name.match(regex)) throw `${nameString} should be alphanumeric value`;
   return name;
 };
 
@@ -67,7 +56,6 @@ let validateNumber = (num, tex) => {
 
 module.exports = { 
   validateId,
-  validateText, 
   validateName,
   validateEmail, 
   validatePassword, 
