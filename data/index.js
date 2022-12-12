@@ -3,8 +3,8 @@ const courseData = require('./courses');
 const reviewData = require('./reviews');
 const commentData = require('./comments');
 module.exports = { 
-    students: studentData,
     courses: courseData,
+    students: studentData,
     reviews: reviewData,
     comments: commentData
 };
