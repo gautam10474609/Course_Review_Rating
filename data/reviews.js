@@ -7,10 +7,10 @@ const validate = require('../helper');
 const { ObjectId } = require('mongodb');
 
 module.exports = {
-    async addReview(courseId, studentId, semesterVal, reviewText, rating) {
+    async addReview(courseId, studentId, semesterVal, reviewData, rating) {
         id = validate.validateId(studentId, "studentId");
         id = validate.validateId(courseId, "courseId");
-        reviewText = validate.validateString(reviewText, "review Text")
+        reviewData = validate.validateString(reviewData, "review Text")
         rating = validate.validateNumber(rating, "rating")
         semesterVal = validate.validateString(semesterVal, "semester")
         if (rating < 1 || rating > 5)  throw "Please choose between 1 and 5";
@@ -23,18 +23,18 @@ module.exports = {
             courseId: courseId,
             studentId: studentId,
             semesterVal: semesterVal,
-            reviewText: reviewText,
+            reviewData: reviewData,
             rating: rating,
             comments: []
         }
-        const alreadyReviewed = await reviewCollection.findOne({ 
+        const isReviewed = await reviewCollection.findOne({ 
             $and: [{
                 courseId: courseId
             }, {
                 studentId: studentId
             }]
         });
-        if (alreadyReviewed) throw "Student already reviewed this course";
+        if (isReviewed) throw "Student already reviewed this course";
         
         const insertInfo = await reviewCollection.insertOne(newReviewData);
         if (!insertInfo.acknowledged || !insertInfo.insertedId)throw 'Could not add new Review';
@@ -59,6 +59,13 @@ module.exports = {
         return review;
     },
 
+    async getAllReviews() {
+        const reviewCollection = await reviews();
+        const reviewList = await reviewCollection.find({}).toArray();
+        if (!reviewList) throw "No reviews available";
+        return reviewList;
+    },
+    
     async getReview(id) {
         id = validate.validateId(id, "id");
         const reviewCollection = await reviews();
@@ -67,13 +74,6 @@ module.exports = {
         });
         if (!review) throw `No review exists with the ${id}`;
         return review;
-    },
-
-    async getAllReviews() {
-        const reviewCollection = await reviews();
-        const reviewList = await reviewCollection.find({}).toArray();
-        if (!reviewList) throw "No reviews available";
-        return reviewList;
     },
 
     async updateReview(id,  semesterVal, reviewText, rating) {
@@ -105,7 +105,7 @@ module.exports = {
         const getRev = await reviewcollection.findOne({_id: ObjectId(id)});
         const listOFComments = getRev.comments;
         if (!getRev) throw `No Review with ${id}`;
-        if (!listOFComments) {
+        if (listOFComments) {
            for(let i in listOFComments)
                 try {
                     const deleteCommInfo = await commentCollection.deleteOne({

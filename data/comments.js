@@ -80,7 +80,7 @@ module.exports = {
 
     async updateComment(id, commentText) {
         id = await validate.validateId(id, "commentId");
-        commentInput = await validate.validateString(commentInput, "commentInput")
+        commentText = await validate.validateString(commentText, "commentInput")
         const updateCommentData = {};
         updateCommentData.commentText = commentText;
         const commentCollection = await comments();
@@ -90,7 +90,7 @@ module.exports = {
             { 
                 $set: updateCommentData 
             });
-        if (!updateCommentInfo.modifiedCount) throw "Could not update Comment";
+        if (!updateCommentInfo.modifiedCount) throw "Could not able update Comment";
         return await this.getComment(id);
     }
 }
