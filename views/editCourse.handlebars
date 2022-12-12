@@ -1,13 +1,13 @@
 <div class="card-center">
     <h3>Edit course</h3>
     <form method="POST" action="/courses/edit">
-       <input type="text" name="name" placeholder="course Name" class="inputFields" />
-        <input type="text" name="courseid" placeholder="course Id" class="inputFields" />
-        <input type="text" name="credits" placeholder="course credits" class="inputFields" />
-        <input type="text" name="professorname" placeholder="Professor Name"  class="inputFields" />
-        <input type="text" name="professoremail" placeholder="Professor email"  class="inputFields" />
-        <input type="text" name="taname" placeholder="Ta Name"  class="inputFields" />
-        <input type="text" name="taemail" placeholder="Ta Email"  class="inputFields" />
+       <input type="text" name="name" placeholder="course Name" value="{{course.name}}" class="inputFields" readonly/>
+        <input type="text" name="courseId" placeholder="course Id" value="{{course.courseId}}" class="inputFields" readonly/>
+        <input type="text" name="credits" placeholder="course credits" value="{{course.credits}}" class="inputFields" readonly/>
+        <input type="text" name="professorName" placeholder="Professor Name" value="{{course.prfessorName}}"  class="inputFields" />
+        <input type="text" name="professorEmail" placeholder="Professor email" value="{{course.professorEmail}}"  class="inputFields" />
+        <input type="text" name="taName" placeholder="Ta Name"  value="{{course.taName}}" class="inputFields" />
+        <input type="text" name="taEmail" placeholder="Ta Email" value="{{course.taEmail}}"  class="inputFields" />
        <input type="submit" value="Edit Course" class="btn" />
     </form>
 </div>

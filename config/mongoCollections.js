@@ -17,5 +17,6 @@ module.exports = {
   courses: getCollectionFn("courses"),
   students: getCollectionFn("students"),
   reviews: getCollectionFn("reviews"),
-  comments: getCollectionFn("comments")
+  comments: getCollectionFn("comments"),
+  admin: getCollectionFn("admin")
 };

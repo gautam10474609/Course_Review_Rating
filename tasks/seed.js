@@ -22,98 +22,99 @@ const main = async () => {
     const C10 = await courses.addCourse("Web Programming", "CS 546", 3, "Patrick Hill",  "patrick@stevens.edu", "Aditya Kapoor", "aditya@stevens.edu");
    
     //Seed Sample Students
-    const S1 = await students.addStudents("Donald", "Brown", "donald@stevens.edu", "$2a$16$55b4ftaRCsHZcJ2X3VAmL.X85wi/K3ydOMWRoyafn2ubiA38l4HnK");
-    const S2 = await students.addStudents("Kartik", "Shah", "kartik@stevens.edu", "$2y$16$44T/HRDYr7ZJr5NgxKZ0GO5VUWIO7eEzeh.SQauQqfsUhjLLm8XBq");
-    const S3 = await students.addStudents("Michael", "Trump", "michael@stevens.edu", "$2y$16$hJSJuDrg9GRus/zD3mfg..OhlFSEM1VFeOi4cxJhxKhHHmpPZRnjW");
-    const S4 = await students.addStudents("Sanjeev", "Bhatt", "sanjeev@stevens.edu", "$2y$16$yRArTdcisBcd6ED5FEWJuO/Z.LMWsUbHz52FotTzYtf86Kc4QKE6a");
-    const S5 = await students.addStudents("Danny", "Sussan", "dan@stevens.edu", "$2y$16$KIjnyLrJ02Kpp6Y6HLZ6C.BDZidhOY73JYc4utfKCJB48Ithhr1oK");
-    const S6 = await students.addStudents("Miles", "Tartaglia", "miles@stevens.edu","$2y$16$ZvmyAhGKEXDIe1gDejC38.K7xWYnF2SzYhlr4GTuv6cNFmqbtH2k6");
-    const S7 = await students.addStudents("John", "Rosenberg", "john@stevens.edu", "$2y$16$dm4xV.Gvptu2Xl3Kh/S/suk8OoUoKZXUkqKExk8WD3ZUZXxd4QeK.");
-    const S8 = await students.addStudents("Jessica", "Doen", "jessica@stevens.edu", "$2y$16$nEHCMDVuRC52/1j2AXfsyu5zsh3btEm0a3uvq.35kpEYR/pnFfS2a");
-    const S9 = await students.addStudents("Kamil", "Pelis", "kamil@stevens.edu", "$2y$16$IlU5ezmEuCip.KMmemBi7ePqMtT9JKkzZXhH05ILe7tqeKZemFn.m");
-    const S10 = await students.addStudents("Alice", "Smith", "alice@stevens.edu", "$2y$16$E0t0gNTnCXbW.nvDjnQSZ.yUN0cjdv4sHIWHciyu45N4BEdamdBzu");
+    const S1 = await students.addStudents("Donald", "Brown", "donald@stevens.edu", "Donald@123");
+    const S2 = await students.addStudents("Kartik", "Shah", "kartik@stevens.edu", "Kartik@123");
+    const S3 = await students.addStudents("Michael", "Trump", "michael@stevens.edu", "Michael@123");
+    const S4 = await students.addStudents("Sanjeev", "Bhatt", "sanjeev@stevens.edu", "Sanjeev@123");
+    const S5 = await students.addStudents("Danny", "Sussan", "dann@stevens.edu", "Dann@123");
+    const S6 = await students.addStudents("Miles", "Tartaglia", "miles@stevens.edu","Mile@123");
+    const S7 = await students.addStudents("John", "Rosenberg", "john@stevens.edu", "John@123");
+    const S8 = await students.addStudents("Jessica", "Doen", "jessica@stevens.edu", "Jessica@123");
+    const S9 = await students.addStudents("Kamil", "Pelis", "kamil@stevens.edu", "Kamil@123");
+    const S10 = await students.addStudents("Alice", "Smith", "alice@stevens.edu", "Alice@123");
 
     //Seed Sample Reviews
-    const review1ForC1 = await reviews.addReview(String(C1._id), String(S1._id), "fall2022", "Amazing course! Easy to understand", 4);
-    const comment1ForReview1ForC1 = await comments.addComment(String(S10._id), String(review1ForC1._id), "Yes, the course is very easy!");
-    const comment2ForReview1ForC1 = await comments.addComment(String(S9._id), String(review1ForC1._id), "Yes, Yes, Yes!!");
+    const r1c1 = await reviews.addReview(String(C1._id), String(S1._id), "fall2022", "Concepts are easy to understand", 4);
+    const c1r1c1 = await comments.addComment(String(S10._id), String(r1c1._id), "The course very easy to understand");
+    const c2r1c1 = await comments.addComment(String(S9._id), String(r1c1._id), "Easy to understand the concepts");
 
-    const review2ForC1 = await reviews.addReview(String(C1._id), String(S2._id), "fall2021", "Loved the course!", 5, "");
-    const comment1ForReview2ForC1 = await comments.addComment(String(S8._id), String(review2ForC1._id), "Yes, the course is very easy!");
-    const comment2ForReview2ForC1 = await comments.addComment(String(S7._id), String(review2ForC1._id), "Yes, Yes, Yes!!");
+    const r2c1 = await reviews.addReview(String(C1._id), String(S2._id), "fall2021", "Very Nice course, you can easily understand the concepts", 5, "");
+    const c1r2c1 = await comments.addComment(String(S8._id), String(r2c1._id), "The course very easy to understand");
+    const c2r2c1 = await comments.addComment(String(S7._id), String(r2c1._id), "Easy to understand the concepts");
     
-    const review1ForC2 = await reviews.addReview(String(C2._id), String(S3._id), "spring2022", "Amazing course! Easy to understand", 4);
-    const comment1ForReview1ForC2 = await comments.addComment(String(S6._id), String(review1ForC2._id), "Yes, the course is very easy!");
-    const comment2ForReview1ForC2 = await comments.addComment(String(S5._id), String(review1ForC2._id), "Yes, Yes, Yes!!");
+    const r1c2 = await reviews.addReview(String(C2._id), String(S3._id), "spring2022", "Concepts are easy to understand", 4);
+    const c1r1c2 = await comments.addComment(String(S6._id), String(r1c2._id), "The course very easy to understand");
+    const c2r1c2 = await comments.addComment(String(S5._id), String(r1c2._id), "Easy to understand the concepts");
 
-    const review2ForC2 = await reviews.addReview(String(C2._id), String(S4._id), "fall2021", "Loved the course!", 5);
-    const comment1ForReview2ForC2 = await comments.addComment(String(S3._id), String(review2ForC2._id), "Yes, the course is very easy!");
-    const comment2ForReview2ForC2 = await comments.addComment(String(S2._id), String(review2ForC2._id), "Yes, Yes, Yes!!");
+    const r2c2 = await reviews.addReview(String(C2._id), String(S4._id), "fall2021", "Very Nice course, you can easily understand the concepts", 5);
+    const c1r2c2 = await comments.addComment(String(S3._id), String(r2c2._id), "The course very easy to understand");
+    const c2r2c2 = await comments.addComment(String(S2._id), String(r2c2._id), "Easy to understand the concepts");
     
-    const review1ForC3 = await reviews.addReview(String(C3._id), String(S5._id), "spring2022", "Amazing course! Easy to understand", 4);
-    const comment1ForReview1ForC3 = await comments.addComment(String(S1._id), String(review1ForC3._id), "Yes, the course is very easy!");
-    const comment2ForReview1ForC3 = await comments.addComment(String(S2._id), String(review1ForC3._id), "Yes, Yes, Yes!!");
+    const r1c3 = await reviews.addReview(String(C3._id), String(S5._id), "spring2022", "Concepts are easy to understand", 4);
+    const c1r1c3 = await comments.addComment(String(S1._id), String(r1c3._id), "The course very easy to understand");
+    const c2r1c3 = await comments.addComment(String(S2._id), String(r1c3._id), "Easy to understand the concepts");
 
-    const review2ForC3 = await reviews.addReview(String(C3._id), String(S6._id), "fall2022", "Loved the course!", 5);
-    const comment1ForReview2ForC3 = await comments.addComment(String(S3._id), String(review2ForC3._id), "Yes, the course is very easy!");
-    const comment2ForReview2ForC3 = await comments.addComment(String(S4._id), String(review2ForC3._id), "Yes, Yes, Yes!!");
+    const r2c3 = await reviews.addReview(String(C3._id), String(S6._id), "fall2022", "Very Nice course, you can easily understand the concepts", 5);
+    const c1r2c3 = await comments.addComment(String(S3._id), String(r2c3._id), "The course very easy to understand");
+    const c2r2c3 = await comments.addComment(String(S4._id), String(r2c3._id), "Easy to understand the concepts");
 
-    const review1ForC4 = await reviews.addReview(String(C4._id), String(S7._id), "fall2021", "Amazing course! Easy to understand", 4);
-    const comment1ForReview1ForC4 = await comments.addComment(String(S5._id), String(review1ForC4._id), "Yes, the course is very easy!");
-    const comment2ForReview1ForC4 = await comments.addComment(String(S6._id), String(review1ForC4._id), "Yes, Yes, Yes!!");
+    const r1c4 = await reviews.addReview(String(C4._id), String(S7._id), "fall2021", "Concepts are easy to understand", 4);
+    const c1r1c4 = await comments.addComment(String(S5._id), String(r1c4._id), "The course very easy to understand");
+    const c2r1c4 = await comments.addComment(String(S6._id), String(r1c4._id), "Easy to understand the concepts");
 
-    const review2ForC4 = await reviews.addReview(String(C4._id), String(S8._id), "spring2022", "Loved the course!", 5);
-    const comment1ForReview2ForC4 = await comments.addComment(String(S7._id), String(review2ForC4._id), "Yes, the course is very easy!");
-    const comment2ForReview2ForC4 = await comments.addComment(String(S9._id), String(review2ForC4._id), "Yes, Yes, Yes!!");
+    const r2c4 = await reviews.addReview(String(C4._id), String(S8._id), "spring2022", "Very Nice course, you can easily understand the concepts", 5);
+    const c1r2c4 = await comments.addComment(String(S7._id), String(r2c4._id), "The course very easy to understand");
+    const c2r2c4 = await comments.addComment(String(S9._id), String(r2c4._id), "Easy to understand the concepts");
     
-    const review1ForC5 = await reviews.addReview(String(C5._id), String(S8._id), "spring2022", "Amazing course! Easy to understand", 4);
-    const comment1ForReview1ForC5 = await comments.addComment(String(S10._id), String(review1ForC5._id), "Yes, the course is very easy!");
-    const comment2ForReview1ForC5 = await comments.addComment(String(S1._id), String(review1ForC5._id), "Yes, Yes, Yes!!");
+    const r1c5 = await reviews.addReview(String(C5._id), String(S8._id), "spring2022", "Concepts are easy to understand", 4);
+    const c1r1c5 = await comments.addComment(String(S10._id), String(r1c5._id), "The course very easy to understand");
+    const c2r1c5 = await comments.addComment(String(S1._id), String(r1c5._id), "Easy to understand the concepts");
 
-    const review2ForC5 = await reviews.addReview(String(C5._id), String(S10._id), "fall2021", "Loved the course!", 5);
-    const comment1ForReview2ForC5 = await comments.addComment(String(S2._id), String(review2ForC5._id), "Yes, the course is very easy!");
-    const comment2ForReview2ForC5 = await comments.addComment(String(S3._id), String(review2ForC5._id), "Yes, Yes, Yes!!");
+    const r2c5 = await reviews.addReview(String(C5._id), String(S10._id), "fall2021", "Very Nice course, you can easily understand the concepts", 5);
+    const c1r2c5 = await comments.addComment(String(S2._id), String(r2c5._id), "The course very easy to understand");
+    const c2r2c5 = await comments.addComment(String(S3._id), String(r2c5._id), "Easy to understand the concepts");
 
-    const review1ForC6 = await reviews.addReview(String(C6._id), String(S1._id), "fall2022", "Amazing course! Easy to understand", 4);
-    const comment1ForReview1ForC6 = await comments.addComment(String(S10._id), String(review1ForC6._id), "Yes, the course is very easy!");
-    const comment2ForReview1ForC6 = await comments.addComment(String(S9._id), String(review1ForC6._id), "Yes, Yes, Yes!!");
+    const r1c6 = await reviews.addReview(String(C6._id), String(S1._id), "fall2022", "Concepts are easy to understand", 4);
+    const c1r1c6 = await comments.addComment(String(S10._id), String(r1c6._id), "The course very easy to understand");
+    const c2r1c6 = await comments.addComment(String(S9._id), String(r1c6._id), "Easy to understand the concepts");
 
-    const review2ForC6 = await reviews.addReview(String(C6._id), String(S2._id), "fall2022", "Loved the course!", 5);
-    const comment1ForReview2ForC6 = await comments.addComment(String(S8._id), String(review2ForC6._id), "Yes, the course is very easy!");
-    const comment2ForReview2ForC6 = await comments.addComment(String(S7._id), String(review2ForC6._id), "Yes, Yes, Yes!!");
+    const r2c6 = await reviews.addReview(String(C6._id), String(S2._id), "fall2022", "Very Nice course, you can easily understand the concepts", 5);
+    const c1r2c6 = await comments.addComment(String(S8._id), String(r2c6._id), "The course very easy to understand");
+    const c2r2c6 = await comments.addComment(String(S7._id), String(r2c6._id), "Easy to understand the concepts");
     
-    const review1ForC7 = await reviews.addReview(String(C7._id), String(S3._id), "fall2021", "Amazing course! Easy to understand", 4);
-    const comment1ForReview1ForC7 = await comments.addComment(String(S6._id), String(review1ForC7._id), "Yes, the course is very easy!");
-    const comment2ForReview1ForC7 = await comments.addComment(String(S5._id), String(review1ForC7._id), "Yes, Yes, Yes!!");
+    const r1c7 = await reviews.addReview(String(C7._id), String(S3._id), "fall2021", "Concepts are easy to understand", 4);
+    const c1r1c7 = await comments.addComment(String(S6._id), String(r1c7._id), "The course very easy to understand");
+    const c2r1c7 = await comments.addComment(String(S5._id), String(r1c7._id), "Easy to understand the concepts");
 
-    const review2ForC7 = await reviews.addReview(String(C7._id), String(S4._id), "spring2022", "Loved the course!", 5);
-    const comment1ForReview2ForC7 = await comments.addComment(String(S3._id), String(review2ForC7._id), "Yes, the course is very easy!");
-    const comment2ForReview2ForC7 = await comments.addComment(String(S2._id), String(review2ForC7._id), "Yes, Yes, Yes!!");
+    const r2c7 = await reviews.addReview(String(C7._id), String(S4._id), "spring2022", "Very Nice course, you can easily understand the concepts", 5);
+    const c1r2c7 = await comments.addComment(String(S3._id), String(r2c7._id), "The course very easy to understand");
+    const c2r2c7 = await comments.addComment(String(S2._id), String(r2c7._id), "Easy to understand the concepts");
     
-    const review1ForC8 = await reviews.addReview(String(C8._id), String(S5._id), "fall2021", "Amazing course! Easy to understand", 4);
-    const comment1ForReview1ForC8 = await comments.addComment(String(S1._id), String(review1ForC8._id), "Yes, the course is very easy!");
-    const comment2ForReview1ForC8 = await comments.addComment(String(S2._id), String(review1ForC8._id), "Yes, Yes, Yes!!");
+    const r1c8 = await reviews.addReview(String(C8._id), String(S5._id), "fall2021", "Concepts are easy to understand", 4);
+    const c1r1c8 = await comments.addComment(String(S1._id), String(r1c8._id), "The course very easy to understand");
+    const c2r1c8 = await comments.addComment(String(S2._id), String(r1c8._id), "Easy to understand the concepts");
 
-    const review2ForC8 = await reviews.addReview(String(C8._id), String(S6._id), "spring2022", "Loved the course!", 5);
-    const comment1ForReview2ForC8 = await comments.addComment(String(S3._id), String(review2ForC8._id), "Yes, the course is very easy!");
-    const comment2ForReview2ForC8 = await comments.addComment(String(S4._id), String(review2ForC8._id), "Yes, Yes, Yes!!");
+    const r2c8 = await reviews.addReview(String(C8._id), String(S6._id), "spring2022", "Very Nice course, you can easily understand the concepts", 5);
+    const c1r2c8 = await comments.addComment(String(S3._id), String(r2c8._id), "The course very easy to understand");
+    const c2r2c8 = await comments.addComment(String(S4._id), String(r2c8._id), "Easy to understand the concepts");
 
-    const review1ForC9 = await reviews.addReview(String(C9._id), String(S7._id), "spring2022", "Amazing course! Easy to understand", 4);
-    const comment1ForReview1ForC9 = await comments.addComment(String(S5._id), String(review1ForC9._id), "Yes, the course is very easy!");
-    const comment2ForReview1ForC9 = await comments.addComment(String(S6._id), String(review1ForC9._id), "Yes, Yes, Yes!!");
+    const r1c9 = await reviews.addReview(String(C9._id), String(S7._id), "spring2022", "Concepts are easy to understand", 4);
+    const c1r1c9 = await comments.addComment(String(S5._id), String(r1c9._id), "The course very easy to understand");
+    const c2r1c9 = await comments.addComment(String(S6._id), String(r1c9._id), "Easy to understand the concepts");
 
-    const review2ForC9 = await reviews.addReview(String(C9._id), String(S8._id), "fall2022", "Loved the course!", 5);
-    const comment1ForReview2ForC9 = await comments.addComment(String(S7._id), String(review2ForC9._id), "Yes, the course is very easy!");
-    const comment2ForReview2ForC9 = await comments.addComment(String(S9._id), String(review2ForC9._id), "Yes, Yes, Yes!!");
+    const r2c9 = await reviews.addReview(String(C9._id), String(S8._id), "fall2022", "Very Nice course, you can easily understand the concepts", 5);
+    const c1r2c9 = await comments.addComment(String(S7._id), String(r2c9._id), "The course very easy to understand");
+    const c2r2c9 = await comments.addComment(String(S9._id), String(r2c9._id), "Easy to understand the concepts");
     
-    const review1ForC10 = await reviews.addReview(String(C10._id), String(S8._id), "fall2022", "Amazing course! Easy to understand", 4);
-    const comment1ForReview1ForC10 = await comments.addComment(String(S10._id), String(review1ForC10._id), "Yes, the course is very easy!");
-    const comment2ForReview1ForC10 = await comments.addComment(String(S1._id), String(review1ForC10._id), "Yes, Yes, Yes!!");
+    const r1c10 = await reviews.addReview(String(C10._id), String(S8._id), "fall2022", "Concepts are easy to understand", 4);
+    const c1r1c10 = await comments.addComment(String(S10._id), String(r1c10._id), "The course very easy to understand");
+    const c2r1c10 = await comments.addComment(String(S1._id), String(r1c10._id), "Easy to understand the concepts");
 
-    const review2ForC10 = await reviews.addReview(String(C10._id), String(S10._id), "fall2021", "Loved the course!", 5);
-    const comment1ForReview2ForC10 = await comments.addComment(String(S2._id), String(review2ForC10._id), "Yes, the course is very easy!");
-    const comment2ForReview2ForC10 = await comments.addComment(String(S3._id), String(review2ForC10._id), "Yes, Yes, Yes!!");
+    const r2c10 = await reviews.addReview(String(C10._id), String(S10._id), "fall2021", "Very Nice course, you can easily understand the concepts", 5);
+    const c1r2c10 = await comments.addComment(String(S2._id), String(r2c10._id), "The course very easy to understand");
+    const c2r2c10 = await comments.addComment(String(S3._id), String(r2c10._id), "Easy to understand the concepts");
     
+    const admin = await courses.addAdmin("admin@gmail.com", "Admin@123");
 
     console.log('Done seeding database for course Collection!');
     db.close()

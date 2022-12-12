@@ -12,6 +12,7 @@ const { ObjectId } = require('mongodb');
 const validate = require('../helper');
 const xss = require('xss');
 const adminCookieString = "AdminCookie"
+
 router.route("/edit")
   .get(async (req, res) => {
     let adminLoggedIn = false;
@@ -30,11 +31,11 @@ router.route("/edit")
       let id = req.body._id;
       let name = req.body.name;
       let courseid = req.body.courseid;
-      let professorname = req.body.professorname;
-      let taname = req.body.taname;
       let credits = Number(req.body.credits);
-      let professoremail = req.body.professoremail;
-      let taemail = req.body.taemail;
+      let professorName = req.body.professorName;
+      let professorEmail = req.body.professorEmail;
+      let taName = req.body.taName;
+      let taEmail = req.body.taEmail;
       try {
         id = await validate.validateId(id, "id");
       } catch (e) {
@@ -60,7 +61,7 @@ router.route("/edit")
         return;
       }
       try {
-        professorname = await validate.validateString(professorname, "professorname");
+        professorName = await validate.validateString(professorName, "Professor Name");
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -76,7 +77,7 @@ router.route("/edit")
         return;
       }
       try {
-        taname = await validate.validateString(taname, "taname");
+        taName = await validate.validateString(taName, "TA Name");
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -84,7 +85,7 @@ router.route("/edit")
         return;
       }
       try {
-        professoremail = await validate.validateEmail(professoremail, "professoremail");
+        professorEmail = await validate.validateEmail(professorEmail, "Professor Email");
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -92,7 +93,7 @@ router.route("/edit")
         return;
       }
       try {
-        taemail = await validate.validateEmail(taemail, "taemail");
+        taEmail = await validate.validateEmail(taEmail, "TA Email");
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -100,7 +101,7 @@ router.route("/edit")
         return;
       }
       try {
-        await courses.updateCourse(name, courseid, credits, professorname, professoremail, taname, taemail);
+        await courses.updateCourse(name, courseid, credits, professorName, professorEmail, taName, taEmail);
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -135,7 +136,7 @@ router.route('/admin')
     }
     try {
       const adminData = await courses.checkAdmin(xss(email), xss(password));
-      if (adminData.insertedAdmin) {
+      if (adminData.checkedAdmin) {
         req.session.AuthCookie = adminCookieString;
         res.redirect("/courses/add");
       } else {
@@ -169,13 +170,13 @@ router
     } else {
       let name = req.body.name;
       let courseid = req.body.courseid;
-      let professorname = req.body.professorname;
-      let taname = req.body.taname;
       let credits = Number(req.body.credits);
-      let professoremail = req.body.professoremail;
-      let taemail = req.body.taemail;
+      let professorName = req.body.professorName;
+      let professorEmail = req.body.professorEmail;
+      let taName = req.body.taName;
+      let taEmail = req.body.taEmail;
       try {
-        name = await validate.validateString(name, "name");
+        name = await validate.validateString(name, "Name");
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -183,7 +184,7 @@ router
         return;
       }
       try {
-        courseid = await validate.validateString(courseid, "courseid");
+        courseid = await validate.validateString(courseid, "Course id");
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -191,7 +192,7 @@ router
         return;
       }
       try {
-        professorname = await validate.validateString(professorname, "professorname");
+        Professorname = await validate.validateString(professorName, "Professor Name");
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -207,7 +208,7 @@ router
         return;
       }
       try {
-        taname = await validate.validateString(taname, "taname");
+        taName = await validate.validateString(taName, "TA Name");
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -215,7 +216,7 @@ router
         return;
       }
       try {
-        professoremail = await validate.validateEmail(professoremail, "professoremail");
+        professorEmail = await validate.validateEmail(professorEmail, "Professor Email");
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -223,7 +224,7 @@ router
         return;
       }
       try {
-        taemail = await validate.validateEmail(taemail, "taemail");
+        taEmail = await validate.validateEmail(taEmail, "TA Email");
       } catch (e) {
         res.status(400).render("error", {
           error: e
@@ -231,7 +232,7 @@ router
         return;
       }
       try {
-        await courses.addCourse(name, courseid, credits, professorname, professoremail, taname, taemail);
+        await courses.addCourse(name, courseid, credits, professorName, professorEmail, taName, taEmail);
         res.redirect("/courses");
       } catch (e) {
         res.status(400).render("error", {

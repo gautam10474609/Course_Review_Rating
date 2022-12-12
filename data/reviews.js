@@ -105,39 +105,39 @@ module.exports = {
         const getRev = await reviewcollection.findOne({_id: ObjectId(id)});
         const listOFComments = getRev.comments;
         if (!getRev) throw `No Review with ${id}`;
-        if (listOFComments) {
-           for(let i in listOFComments)
-                try {
-                    const deleteCommInfo = await commentCollection.deleteOne({
-                        _id: ObjectId(i)
-                    });
-                    if (deleteCommInfo.deletedCount === 0) throw `Could not delete Comment ${i}`;
-                } catch (e){
-                    throw 'Could not delete comment from review';
-                }  
-        }
+        try { 
+            const deleteReviewFromCourse = await courseCollection.updateOne({
+                 _id: ObjectId(getRev.courseId) 
+             }, { 
+                 $pull: { reviews: id.toString() 
+                 } 
+             });
+             if (deleteReviewFromCourse.deletedCount === 0) throw `Could not delete Review ${id}`;
+         } catch (e) {
+             throw `Could not delete review from course`;
+         }
         try {
             const deleteRevFromStuInfo = await studentColection.updateOne({
                  _id: ObjectId(getRev.studentId) 
                 }, { 
-                    $pull: { reviewIds: String(id) 
+                    $pull: { reviewIds: id.toString() 
                     } 
                 });
             if (deleteRevFromStuInfo.deletedCount === 0) throw `Could not delete review ${id}`;
         } catch (e) {
             throw "Could not delete review from students";
         }
-        try { 
-           const deleteReviewFromCourse = await courseCollection.updateOne({
-                _id: ObjectId(getRev.courseId) 
-            }, { 
-                $pull: { reviews: String(id) 
-                } 
-            });
-            if (deleteReviewFromCourse.deletedCount === 0) throw `Could not delete Review ${id}`;
-        } catch (e) {
-            throw `Could not delete review from course`;
-        }
+        if (listOFComments) {
+            for(let i in listOFComments)
+                 try {
+                     const deleteCommInfo = await commentCollection.deleteOne({
+                         _id: ObjectId(i)
+                     });
+                     if (deleteCommInfo.deletedCount === 0) throw `Could not delete Comment ${i}`;
+                 } catch (e){
+                     throw 'Could not delete comment from review';
+                 }  
+         }
         const deleteReviewInfo = await reviewcollection.deleteOne({
             _id: ObjectId(id)
         });

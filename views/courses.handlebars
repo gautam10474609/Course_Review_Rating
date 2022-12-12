@@ -13,8 +13,8 @@
         <div class = "card" onclick="location.href='../courses/{{this._id}}';">
             <h2><a href="/courses/{{this._id}}">{{this.courseId}} {{this.name}} </a></h2>
             <p>credits: {{this.credits}}</p>
-            <p>Professor: {{this.professorname}},  Email:{{this.professoremail}} </p>
-            <p>TA: {{this.taname}},  Email: {{this.taemail}}</p>  
+            <p>Professor: {{this.professorName}},  Email:{{this.professorEmail}} </p>
+            <p>TA: {{this.taName}},  Email: {{this.taEmail}}</p>  
             {{#if this.rated}}  
             <p class="avg">{{this.rating}}/5</p>
             {{else}}
