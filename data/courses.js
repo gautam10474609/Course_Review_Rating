@@ -1,26 +1,29 @@
 const mongoCollections = require("../config/mongoCollections");
 const courses = mongoCollections.courses;
-const validate = require('../helper');
+const admin = mongoCollections.admin;
 const { ObjectId } = require('mongodb');
+const bcrypt = require("bcryptjs");
+const validate = require('../helper');
+const saltRounds = 16;
 
 module.exports = {
-    async addCourse(name, courseId, credits, professorname, professoremail, taname,  taemail) {
+    async addCourse(name, courseId, credits, professorName, professorEmail, taName,  taEmail) {
         name = await validate.validateName(name, "course Name");
         courseId = await validate.validateString(courseId, "courseId");
-        professorname = await validate.validateName(professorname, "Profesor Name");
-        taname = await validate.validateName(taname, "TA Name");
-        professoremail = await validate.validateEmail(professoremail, "Professor Email");
-        taemail = await validate.validateEmail(taemail, "TA Email");
+        professorName = await validate.validateName(professorName, "Profesor Name");
+        taName = await validate.validateName(taName, "TA Name");
+        professorEmail = await validate.validateEmail(professorEmail, "Professor Email");
+        taEmail = await validate.validateEmail(taEmail, "TA Email");
         if (!credits) throw "Credits should not be empty";
         const courseCollection = await courses();
         let addNewCoursebyAdmin = {
             name: name,
             courseId: courseId,
-            professorname: professorname,
-            taname: taname,
+            professorName: professorName,
+            taName: taName,
             credits: credits,
-            professoremail: professoremail,
-            taemail: taemail,
+            professorEmail: professorEmail,
+            taEmail: taEmail,
             rating: 0,
             reviews: [],
         }
@@ -48,24 +51,24 @@ module.exports = {
         return course;
     },
 
-    async updateCourse(id, name, courseId, credits, professorname, professoremail, taname, taemail) {
+    async updateCourse(id, name, courseId, credits, professorName, professorEmail, taName, taEmail) {
         id = await validate.validateId(id, "id");
         name = await validate.validateName(name, "course Name");
         courseId = await validate.validateId(courseId, "courseId");
-        professorname = await validate.validateName(professorname, "Profesor Name");
-        taname = await validate.validateName(taname, "TA Name");
-        professoremail = await validate.validateEmail(professoremail, "Professor Email");
-        taemail = await validate.validateEmail(taemail, "TA Email");
+        professorName = await validate.validateName(professorName, "Profesor Name");
+        taName = await validate.validateName(taName, "TA Name");
+        professorEmail = await validate.validateEmail(professorEmail, "Professor Email");
+        taEmail = await validate.validateEmail(taEmail, "TA Email");
         if (!credits) throw "Credits should not be empty";
         const courseCollection = await courses();
         let updatedCourse = {
             name: name,
             courseId: courseId,
-            professorname: professorname,
-            taname: taname,
+            professorName: professorName,
+            taName: taName,
             credits: credits,
-            professoremail: professoremail,
-            taemail: taemail
+            professorEmail: professorEmail,
+            taEmail: taEmail
         }
         const updateInfo = await courseCollection.updateOne({ 
             _id: ObjectId(id) 
@@ -88,9 +91,34 @@ module.exports = {
         email = validate.validateEmail(email, "Email");
         password = validate.validatePassword(password);
         email = email.toLowerCase();
-        if (email === "admin@gmail.com" && password === "Admin@123") { 
-            return { insertedAdmin: true };
+        const adminCollection = await admin();
+        const adm = await adminCollection.findOne({ email: email });
+        console.log(adm)
+        if (adm) { 
+          const passwordMatch = await bcrypt.compare(password, adm.hashedPassword);
+          if (passwordMatch){
+            return { checkedAdmin: true };
+          }else
+            throw "Either the email or password is invalid";
         } else
         throw "Either the email or password is invalid";
     },
+    async addAdmin(email, password) {
+        email = validate.validateEmail(email, "Email");
+        password = validate.validatePassword(password);
+       const adminCollection = await admin();
+       email = email.toLowerCase();
+       const adm = await adminCollection.findOne({ email: email });
+       const passwordHash = await bcrypt.hash(password, saltRounds);
+       if (!adm) {
+           let newAdmin = {
+               email: email,
+               hashedPassword: passwordHash
+           }
+           const insertInfo = await adminCollection.insertOne(newAdmin);
+           if (!insertInfo.acknowledged || !insertInfo.insertedId) throw "Not able to add new admin";
+            return {insertedAdmin: true};
+       } else
+           throw "Please try with other email. This email is already registered.";
+   },
 }

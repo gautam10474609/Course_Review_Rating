@@ -2,8 +2,8 @@
     <div class="card-wide" id="sticky">
         <h1>{{course.courseId}}, {{course.name}}</h1>
         <p>credits: {{course.credits}}</p>
-        <p>Professor: {{course.professorname}}, Email:{{course.professoremail}} </p>
-        <p>TA: {{course.taname}}, Email: {{course.taemail}}</p>
+        <p>Professor: {{course.professorName}}, Email:{{course.professorEmail}} </p>
+        <p>TA: {{course.taName}}, Email: {{course.taEmail}}</p>
         <p class="avg">{{course.rating}}/5 ({{course.reviews.length}} Reviews)</p>
         {{#each semsVal}}
         <p>{{this.val}} {{this.semrat}} </p>

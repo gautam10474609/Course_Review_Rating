@@ -61,9 +61,8 @@ module.exports = {
         email = email.toLowerCase();
         const student = await studentCollection.findOne({ email: email });
         if (student) { 
-          const samePassord = await bcrypt.compare(password, student.hashedPassword);
-          if (samePassord){
-            
+          const passwordMatch = await bcrypt.compare(password, student.hashedPassword);
+          if (passwordMatch){
             return { student: student };
           }else
             throw "Either the email or password is invalid";
