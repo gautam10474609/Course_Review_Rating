@@ -4,13 +4,11 @@ const reviews = mongoCollections.reviews;
 const validate = require('../helper');
 const { ObjectId } = require('mongodb');
 
-
 module.exports = {
-    async addComment(studentId, reviewId, commentInput) {
-        id = await validate.validateId(studentId, "studentId");
-        id = await validate.validateId(reviewId, "validateId");
-        commentInput = await  validate.validateString(commentInput, "commentInput")
-
+    async createComment(studentId, reviewId, commentInput) {
+        id = await validate.validateId("createComment", studentId, "studentId");
+        id = await validate.validateId("createComment", reviewId, "validateId");
+        commentInput = await validate.validateString("createComment", commentInput, "commentInput")
         const commentCollection = await comments();
         let addNewComment = {
             studentId: studentId,
@@ -19,36 +17,37 @@ module.exports = {
         }
         const insertInfo = await commentCollection.insertOne(addNewComment);
         const reviewCollection = await reviews();
-
         if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-            throw 'Could not add new Review';
+            throw 'createComment: Could not add new Review';
         } else {
-            const updatedInfo = await reviewCollection.updateOne({ 
-                _id: ObjectId(reviewId) 
-            }, { $push: 
-                { comments: addNewComment._id.toString()
-                } 
+            const updatedInfo = await reviewCollection.updateOne({
+                _id: ObjectId(reviewId)
+            }, {
+                $push:
+                {
+                    comments: addNewComment._id.toString()
+                }
             });
             if (!updatedInfo.matchedCount && !updatedInfo.modifiedCount) {
-                throw 'Could not update Review Collection with Review Data!';
+                throw 'createComment: Could not update Review Collection with Review Data!';
             }
         }
-        const newId = insertInfo.insertedId.toString();
-        return await this.getComment(newId);;
+        const commentId = insertInfo.insertedId.toString();
+        return await this.getComment(commentId);
     },
 
     async getAllComments() {
         const commentCollection = await comments();
         const allComment = await commentCollection.find({}).toArray();
-        if (!allComment) throw "No comments available";
+        if (!allComment) throw "getAllComments: No comments available";
         return allComment;
     },
 
     async getComment(id) {
-        id = await validate.validateId(id, "commentId");
+        id = await validate.validateId("getComment", id, "commentId");
         const commentCollection = await comments();
         const comment = await commentCollection.findOne({ _id: ObjectId(id) });
-        if (!comment) throw `No comment exists with the ${id}`;
+        if (!comment) throw `getComment: No comment exists with the ${id}`;
         return comment;
     },
 
@@ -58,39 +57,39 @@ module.exports = {
         let comment = await this.getComment(id);
         const deleteInfo = await commentCollection.deleteOne({ _id: ObjectId(id) });
         if (deleteInfo.deletedCount === 0) {
-            throw `No comment exists with the ${id}`;
+            throw `removeComment: No comment exists with the ${id}`;
         }
         try {
             const reviewCollection = await reviews();
-            const deletionInfoForCommentFromReview = await reviewCollection.updateOne({ 
-                _id: ObjectId(comment.reviewId) 
-            }, { 
-                    $pull: { comments: id.toString() 
-                    }
-                 });
-
+            const deletionInfoForCommentFromReview = await reviewCollection.updateOne({
+                _id: ObjectId(comment.reviewId)
+            }, {
+                $pull: {
+                    comments: id.toString()
+                }
+            });
             if (deletionInfoForCommentFromReview.deletedCount === 0) {
-                throw `Could not delete Comment ${id}`;
+                throw `removeComment: Could not delete Comment ${id}`;
             }
-        } catch (e) {
-            throw "not able delete comment from review comments";
+        } catch (error) {
+            throw "removeComment: Not able delete comment from review comments";
         }
         return true;
     },
 
     async updateComment(id, commentText) {
-        id = await validate.validateId(id, "commentId");
-        commentText = await validate.validateString(commentText, "commentInput")
+        id = await validate.validateId("updateComment", id, "commentId");
+        commentText = await validate.validateString("updateComment", commentText, "commentInput")
         const updateCommentData = {};
         updateCommentData.commentText = commentText;
         const commentCollection = await comments();
-        const updateCommentInfo = await commentCollection.updateOne({ 
-            _id: ObjectId(id) 
-        }, 
-            { 
-                $set: updateCommentData 
+        const updateCommentInfo = await commentCollection.updateOne({
+            _id: ObjectId(id)
+        },
+            {
+                $set: updateCommentData
             });
-        if (!updateCommentInfo.modifiedCount) throw "Could not able update Comment";
+        if (!updateCommentInfo.modifiedCount) throw "updateComment: Could not able update Comment";
         return await this.getComment(id);
     }
 }

@@ -1,27 +1,29 @@
 <main>
-    <div class = "courses_heading">
-        <div class="reviewHeading">
-            <div class="courses_title">
-                <h1>courses</h1>
-            </div>
-            <div class="admin">
-                 <h1><a href="/courses/admin">Admin</h1>
-            </div>
-        </div>
-    </div>
+    <h1>Courses</h1>
     {{#each courses}}
-        <div class = "card" onclick="location.href='../courses/{{this._id}}';">
-            <h2><a href="/courses/{{this._id}}">{{this.courseId}} {{this.name}} </a></h2>
+    <div class="each-section" onclick="location.href='../courses/{{this._id}}';">
+        <h2><a href="/courses/{{this._id}}">{{this.courseId}} {{this.name}} </a></h2>
+        <div>
             <p>credits: {{this.credits}}</p>
-            <p>Professor: {{this.professorName}},  Email:{{this.professorEmail}} </p>
-            <p>TA: {{this.taName}},  Email: {{this.taEmail}}</p>  
-            {{#if this.rated}}  
-            <p class="avg">{{this.rating}}/5</p>
-            {{else}}
-            <p class="avg">No Reviews</p>
-            {{/if}}
-            <br/>
         </div>
+        <div>
+            <p>Professor: {{this.professorName}}, Email:{{this.professorEmail}} </p>
+        </div>
+        <div>
+            <p>TA: {{this.taName}}, Email: {{this.taEmail}}</p>
+        </div>
+        {{#if this.isRated}}
+        <div>
+            <p>{{this.rating}}/5</p>
+        </div>
+        {{else}}
+        <div>
+            <p>No Review available for this course</p>
+        </div>
+        {{/if}}
+        <br />
+    </div>
     {{/each}}
     </div>
+    
 </main>

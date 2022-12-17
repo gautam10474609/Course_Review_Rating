@@ -12,7 +12,6 @@
         <label for="firstname">
           <input
             type="text"
-            class="registerInput"
             name="firstname"
             id="firstname"
             placeholder="Enter your First Name"
@@ -25,7 +24,6 @@
         <label for="lastname">
           <input
             type="text"
-            class="registerInput"
             name="lastname"
             id="lastname"
             placeholder="Enter your Last Name"
@@ -38,7 +36,6 @@
         <label for="email">
           <input
             type="text"
-            class="registerInput"
             name="email"
             id="email"
             placeholder="Enter your Email"
@@ -50,33 +47,18 @@
       <div class="group">
         <input
           type="password"
-          class="registerInput"
           id="password"
           name="password"
           minlength="8"
-          placeholder="Enter a Password(8 characters minimum)"
-          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-          title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"
+          placeholder="Enter a Password"
           required
         />
         <span id="passwordError" class="error"></span>
       </div>
-      <div id="message">
-        <h3>Password must contain the following:</h3>
-        <p id="letter" class="invalid">A <b>lowercase</b> letter</p>
-        <p id="capital" class="invalid">A <b>capital (uppercase)</b> letter</p>
-        <p id="number" class="invalid">A <b>number</b></p>
-        <p id="length" class="invalid">Minimum <b>8 characters</b></p>
-      </div>
-      <br />
       <div class="group">
         <button type="submit" class="btn">Register</button>
-      </div>
-      {{#if error}}
-        <p class="error-msg">{{error}}</p>
-      {{/if}}
+      </div>  
     </form>
-
   </div>
 
   <script

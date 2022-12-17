@@ -1,30 +1,38 @@
 <!DOCTYPE html>
 <html lang="en-us">
-    <head>
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Course Review Rating</title>
     <link rel="icon" type="image/png" sizes="16x16" href="../../public/images/favicon.jpeg">
-
     <link rel="stylesheet" type="text/css" href="../../public/css/style.css">
     <link href="https://fonts.googleapis.com/css?family=Monstserrat|Mukta&amp;display=swap" rel="stylesheet">
 </head>
-    
-    <body>
-        <nav>
-            <li><a href="/">Home</a></li>
-            <li><a href="/courses">Courses</a></li>
-            {{#if studentLoggedIn}}
+
+<body>
+    <header>
+            <nav>
+                <li><a href="/">Home</a></li>
+                <li><a href="/courses">Courses</a></li>
+                {{#if studentLoggedIn}}
                 <li><a href="/students/profile" id="profile">Profile</a></li>
-                <li><a href="/students/logout" id ="logout">Logout</a></li>
-            {{else if adminLoggedIn}}
-                <li><a href="/courses/add" id ="addCourse">Add course</a></li>
-                 <li><a href="/students/logout" id ="logout">Logout</a></li>
-            {{else}} 
-                <li><a href="/students/login" id="auth">Login</a></li>
-                <li><a href="/courses/admin">Admin</a></li>
-            {{/if}}
+                <li><a href="/students/logout" id="logout">Logout</a></li>
+                {{else if adminLoggedIn}}
+                <li><a href="/courses/add" id="addCourse">Add course</a></li>
+                <li><a href="/students/logout" id="logout">Logout</a></li>
+                {{else}}
+                <li><a href="/students/login" id="login">Login</a></li>
+                <li><a href="/courses/admin" id="admin">Admin</a></li>
+                {{/if}}
+            </nav>
+    </header>
+    {{{ body }}}
+    <footer>
+        <nav>
+            <li><a href="/courses/contactus" id="contact-us">Contact-US</a></li>
         </nav>
-        {{{ body }}}
-    </body>
+    </footer>
+</body>
+
 </html>

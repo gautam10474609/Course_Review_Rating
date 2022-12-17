@@ -1,12 +1,18 @@
 <main>
     <div class="container">
         <h1>Welcome to the Course Review and applications!</h1>
-        <p>Choose the best course based on the review and ratings provided by students who taken the course</p>
-        <div for="searchCourse">
-            <form id="searchCourse-form" method="POST" action="/courses/search">
-                <input id="searchCourse" type="text" name="search" class = "searchFields" placeholder="Search for a course" />
-                <input type="submit" class = "btn" value="Search" />
-            </form>
-        </div>
+        {{#unless studentLoggedIn}}
+        {{#unless adminLoggedIn}}
+            <p>Are you new Student? You can review the <a href="/courses">Courses </a></p>
+            <p>Are you existing Student already taken the course? Please <a href="/students/login"> Login </a>to provide your rating!</p>
+            <p>Are you Admin? Please <a href="/courses/admin"> Login </a>to add/edit courses</p>
+        {{else}}
+            <p>You want add courses? Click <a href="/courses/add">Add Course</p>
+           <p>You want edit course?<a href="/courses/edit">Edit Course</p>
+        {{/unless}}
+        {{else}}
+            <p>Please review the courses <a href="/courses">Courses </a></p>
+        {{/unless}}
     </div>
+    
 </main>

@@ -1,85 +1,52 @@
 <main>
-    <div class="card-wide" id="sticky">
-        <h1>{{course.courseId}}, {{course.name}}</h1>
-        <p>credits: {{course.credits}}</p>
-        <p>Professor: {{course.professorName}}, Email:{{course.professorEmail}} </p>
-        <p>TA: {{course.taName}}, Email: {{course.taEmail}}</p>
-        <p class="avg">{{course.rating}}/5 ({{course.reviews.length}} Reviews)</p>
-        {{#each semsVal}}
-        <p>{{this.val}} {{this.semrat}} </p>
-        {{/each}}
+    <div class="course">
+        <div class="container-widemode" id="positionfixed">
+            <h1>{{course.courseId}}, {{course.name}}</h1>
+            <div>
+                <label>credits: {{course.credits}}</label>
+            </div>
+            <div>
+                <label>Professor: {{course.professorName}}, Email:{{course.professorEmail}} </label>
+            </div>
+            <div>
+                <label>TA: {{course.taName}}, Email: {{course.taEmail}}</label>
+            </div>
+            <div>
+                <label>{{course.rating}}/5 ({{course.reviews.length}} Reviews)</label>
+            </div>
+       
+            {{#each semsVal}}
+            <div>
+                <p>{{this.val}}: {{this.semrat}} </p>
+            </div>
+            {{/each}}
+        </div>
     </div>
-
-    <div class="card-wide" id="right">
-        <h2>Reviews</h2>
+    <div class="container-widemode" id="right">
+        <h2>Reviews And Ratings</h2>
         {{#each reviews}}
         <div class="reviews">
-            <div class="card-full">
-                <div class="reviewHeading">
-                    <div class="reviewerName">
-                        <h3 class="p_inline"><a href="/students/{{this.student._id}}">{{this.student.firstName}}
-                                {{this.student.lastName}}</a></h3>
-                    </div>
-                    <div class="reviewerRating">
-                        <h3 class="rating">Rating: {{this.rating}}/5</h3>
-                    </div>
-                </div>
-
-
-                <p>{{this.reviewText}}</p>
-
-                {{#if this.isStudentReviewer}}
-                {{#if this.studentLoggedIn}}
-                <div class="dropdown">
-                    <button class="dropbtn">Options</button>
-                    <div class="dropdown-content">
-                        <p><a href="../reviews/{{this._id}}/edit">Edit Review</a></p>
-                        <p><a href="../reviews/{{this.courseId}}/{{this._id}}/delete">Delete Review</a></p>
-                    </div>
-                </div>
-                {{/if}}
-                {{/if}}
+            <div class="container-fullmode">
+                <label>
+                    <p><a href="/students/{{this.student._id}}">{{this.student.firstName}} {{this.student.lastName}}</a></p>
+                    <p>{{this.semesterVal}}, Rating: {{this.rating}}/5</p>
+                    <p>{{this.reviewText}}</p>
+                </label>
                 <h4>Comments</h4>
                 <div class="comments">
                     {{#if ../studentLoggedIn}}
-                    <form id="login-form" name="loginForm" class="form-container"
-                        action="/comments/{{../currentStudentsData._id}}/{{this._id}}/{{this.courseId}}/add"
-                        method="POST">
+                    <form id="comment-form" name="commentForm" class="form-container" action="/comments/{{../currentStudentsData._id}}/{{this._id}}/{{this.courseId}}/add" method="POST">
                         <label>
-                            <input type="textarea" name="commentValue" id="commentValue" class="inputFields"
-                                placeholder="Write a comment..." rows="3" required />
+                            <input type="textarea" name="commentValue" id="commentValue" placeholder="comment" rows="3" required />
                         </label>
                         <button type="submit" class="btn">Submit</button>
                     </form>
                     {{/if}}
                     {{#each this.commentList}}
-                    <div class="card-full" id="white-card">
-                        <p class="p_inline"><a href="../students/{{this.student._id}}">{{this.student.firstName}}
+                    <div class="container-fullmode" id="white-card">
+                        <p class="inline_para"><a href="../students/{{this.student._id}}">{{this.student.firstName}}
                                 {{this.student.lastName}}</a></p>
-                        <p id="comment-value-tag-{{@index}}">{{this.commentText}}</p>
-                        {{#if this.isComment}}
-                        <form id="comment-form-{{@index}}" name="loginForm" class="comment-container"
-                            action="/comments/{{this.courseId}}/{{this._id}}/edit" method="POST">
-                            <label>
-                                <input type="textarea" name="commentValue" id="commentValue" class="inputFields"
-                                    placeholder="Edit your comment..." required />
-                            </label>
-                            <button type="submit" class="btn">Post!</button>
-                            <button type="button" class="btn cancel"
-                                onclick="javascript:commentBoxEditForm('{{@index}}');">Cancel</button>
-                        </form>
-                        {{#if this.isStudentReviewer}}
-                        {{#if this.studentLoggedIn}}
-                        <div class="dropdown">
-                            <button class="dropbtn">Options</button>
-                            <div class="dropdown-content">
-                                <p><a href="javascript:commentBoxEditForm('{{@index}}');">Edit Comment</a></p>
-                                <p><a href="/comments/{{this.courseId}}/{{this._id}}/delete">Delete Comment</a></p>
-                            </div>
-                        </div>
-                        {{/if}}
-                        {{/if}}
-                        {{/if}}
+                        <p id="comment-Val">{{this.commentText}}</p> 
                     </div>
                     {{/each}}
                 </div>
@@ -87,20 +54,20 @@
         </div>
         {{/each}}
     </div>
-    {{#if studentLoggedIn}}
+    {{#if adminLoggedIn}}
+        <button class="add_review_btn" onclick="location.href='../courses/{{course._id}}/edit';">Edit course</button>   
+    {{else if studentLoggedIn}}
     {{#if currentStudentsData.reviewedcoursePage}}
-    <button class="open-button" onclick="openAlert()">Add a Review</button>
+        <button id="reviewed_popup" class="add_review_btn" onclick="openAlert()">Add a Review</button>
     {{else}}
-    <button class="open-button" onclick="openReviewForm()">Add a Review</button>
-    {{/if}}
-    {{else if adminLoggedIn}}
-    <button class="open-button" onclick="openCourseEdit()">Edit course</button>
+     <button id="add_review_popup" class="add_review_btn" onclick="opencreateReview()">Add a Review</button>
+    {{/if}} 
     {{else}}
-    <button class="open-button" onclick="openLoginForm()">Add a Review</button>
+        <button class="add_review_btn" onclick="location.href='../students/login';">Add a Review</button>
     {{/if}}
-    <div class="form-popup" id="reviewForm">
+    <div class="form-popup" id="add_review">
         <h2>Add a Review</h2>
-        <form method="POST" action="/reviews/{{course._id}}/add">
+        <form id="review_form" action="/reviews/{{course._id}}/add" method="POST" >
             <p> Select semester:
                 <select name="selectSemester" id="selectSemester">
                     <option name="fall2022" value="fall2022">Fall 2022</option>
@@ -109,100 +76,43 @@
                 </select>
             </p>
             <label>
-                <input type="text" name="rating" id="rating" class="inputFields" pattern="\d+"
-                    placeholder="Enter your Rating" required title="Enter a Number from 1 to 5" />
+                <input type="text" pattern="\d+" min="1" max="5" name="rating" id="rating"
+                    placeholder="Enter your Rating" required/>
             </label>
             <label>
-                <input type="text" name="reviewText" id="reviewText" class="inputFields" placeholder="Enter your Review"
+                <input type="text" name="reviewText" id="reviewText" placeholder="Enter your Review"
                     required />
             </label>
             <button type="submit" class="btn">Add Review</button>
-            <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
+            <button type="button" class="btn cancel" onclick="closecreateReview()">Cancel</button>
         </form>
     </div>
-    <div class="form-popup" id="myLoginForm">
-        <h2>Login to add a review!</h2>
-        <form id="login-form" name="loginForm" class="form-container" action="javascript:void(0);">
-            <button type="submit" class="btn" id="routeToLogin">Login</button>
-            <button type="button" class="btn cancel" onclick="closeLoginForm()">Cancel</button>
-        </form>
-    </div>
-    <div class="form-popup" id="myAlert">
-        <p>You have already added a Review! <br> You can edit your Review Above.</p>
-        <form id="login-form" name="loginForm" class="form-container" action="javascript:void(0);">
+    <div class="form-popup" id="openalert_form">
+        <p>You have already added a Review!</p>
+           <p>You can edit your Review in your Profile</a></p>
+        <form id="review-edit_form" name="review-edit_form" class="form-container" action="javascript:void(0);">
             <button type="button" class="btn cancel" onclick="closeAlert()">Close</button>
         </form>
     </div>
-    <div class="form-popup" id="editcourseForm">
-        <h2>Edit course</h2>
-        <form id="login-form" name="loginForm" class="form-container" action="javascript:void(0);">
-            <button type="submit" class="btn" id="routeToEdit">Edit Course</button>
-            <button type="button" class="btn cancel" onclick="closeLoginForm()">Cancel</button>
-        </form>
-    </div>
     <div>
-        {{#if isError}}
-        <div class="error">
-            <ul>
-                {{#each error}}
-                <li>
-                    {{this}}
-                </li>
-                {{/each}}
-            </ul>
-        </div>
-        {{/if}}
+       
     </div>
     <script>
-        function openLoginForm() {
-            document.getElementById("myLoginForm").style.display = "block";
-        }
-        function closeLoginForm() {
-            document.getElementById("myLoginForm").style.display = "none";
-        }
-        function openReviewForm() {
-            document.getElementById("reviewForm").style.display = "block";
-        }
-        function closeReviewForm() {
-            document.getElementById("reviewForm").style.display = "none";
-        }
-        function openCourseEdit() {
-            document.getElementById("editcourseForm").style.display = "block";
-        }
-        function closeCourseEdit() {
-            document.getElementById("editcourseForm").style.display = "none";
+        function opencreateReview() {
+            document.getElementById("add_review").style.display = "block";
+             document.getElementById("add_review_popup").style.display = "none";
         }
         function openAlert() {
-            document.getElementById("myAlert").style.display = "block";
+            document.getElementById("openalert_form").style.display = "block";
+            document.getElementById("add_review_btn").style.display = "none";
+        }
+        function closecreateReview() {
+            document.getElementById("add_review").style.display = "none";
+            document.getElementById("add_review_popup").style.display = "block";
         }
         function closeAlert() {
-            document.getElementById("myAlert").style.display = "none";
+            document.getElementById("openalert_form").style.display = "none";
+            document.getElementById("add_review_btn").style.display = "block";
         }
-        function openCommentBox() {
-            document.getElementById("row-override").style.display = "block";
-        }
-        function commentBoxEditForm(index) {
-            var formElement = "comment-form-" + index;
-
-            var x = document.getElementById(formElement);
-            if (x.style.display === "none") {
-                x.style.display = "block";
-            } else {
-                x.style.display = "none";
-            }
-        }
-
-        function closeCommentBox() {
-            document.getElementById("row-override").style.display = "none";
-        }
-
-        document.getElementById("routeToLogin").onclick = function () {
-            location.href = "/students/login";
-        };
-
-        document.getElementById("routeToEdit").onclick = function () {
-            location.href = "/courses/edit";
-        };
-
     </script>
 </main>

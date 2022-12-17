@@ -1,8 +1,10 @@
 (function ($) {
-  const $form = $('#adminlogin');
-  var $form = $('#adminlogin-form'),
-    email = $('#email'),
-    password = $('#password')
+  const $form = document.getElementById('adminlogin');
+  const email = document.getElementById('email');
+  const password = document.getElementById('password');
+  const emailError = document.getElementById('emailError');
+  const passwordError = document.getElementById('passwordError');
+  
   let validateEmail = (email) => {
     const emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
     if (!emailRegex.test(email))
@@ -16,38 +18,44 @@
       return false;
     return true
   };
-  $form.addEventListener("submit", function login(event) {
+  $form.addEventListener("submit", function (event) {
     event.preventDefault();
     $(".error-msg").hide();
     var valid = false;
-    var emailVal = email.val();
-    var passwordVal = password.val();
+    var emailVal = email.value;
+    var passwordVal = password.value;
     if (emailVal.trim().length == 0) {
-      $("#emailError").innerHTML = "Please enter email"
-      $("#emailError").show().fadeOut(5000);
+      emailError.style.display = "block";
+      emailError.innerHTML = "Please enter email"
+      emailError.show().fadeOut(5000);
       valid = true;
     } else if (!validateEmail(emailVal)) {
-      $("#emailError").innerHTML = "Please enter valid email"
-      $("#emailError").show().fadeOut(5000);
+      emailError.style.display = "block";
+      emailError.innerHTML = "Please enter valid email"
+      emailError.show().fadeOut(5000);
       valid = true;
     }
 
     if (passwordVal.trim().length == 0) {
-      $("#passwordError").innerHTML = "Please enter password"
-      $("#passwordError").show().fadeOut(5000);
+      passwordError.style.display = "block";
+      passwordError.innerHTML = "Please enter password"
+      passwordError.show().fadeOut(5000);
       valid = true;
     } else if (passwordVal.length < 8) {
-      $("#passwordError").innerHTML = "Password should be atleast 8 characters long"
-      $("#passwordError").show().fadeOut(5000);
+      passwordError.innerHTML = "Password should be atleast 8 characters long"
+      passwordError.show().fadeOut(5000);
       valid = true;
     } else if (!validatePassword(passwordVal)) {
-      $("#passwordError").innerHTML = "Password should contain one uppercase, one lower case, one special character and one number"
-      $("#passwordError").show().fadeOut(5000);
+      passwordError.innerHTML = "Password should contain one uppercase, one lower case, one special character and one number"
+      passwordError.show().fadeOut(5000);
       valid = true;
     }
 
     if (valid) {
       return;
+    }else{
+      emailError.style.display = "none";
+      passwordError.style.display = "none";
     }
 
     $.ajax({
@@ -63,7 +71,6 @@
         window.location.replace("/");
       },
       error: function (responseError) {
-        console.log(responseError);
         error.innerHTML = JSON.parse(
           responseError.responseText
         ).message.preventXSS();

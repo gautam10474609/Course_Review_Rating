@@ -1,23 +1,20 @@
 <main>
     <h1>Login to add new course</h1>
-    <div class="loginPage" id="adminlogin-details">
-        <h2>Login</h2>
+    <div class="container" id="adminlogin-details">
         <form id="adminlogin-form" name="adminloginForm" action="/courses/admin" method="POST">
-            <label>
-                <input type="text" class="adminloginInput" name="email" id="email" placeholder="Enter your Email" />
+            <label for="email">Email: </label>
+                <input type="text" name="email" id="email" placeholder="Enter your Email" />
                 <span id="emailError" class="error"></span>
-            </label>
-            <label>
-                <input type="password" class="adminloginInput" name="password" id="password"
-                    placeholder="Enter your Password" />
+             <label for="password">Password:</label>
+                <input type="password" name="password" id="password" placeholder="Enter your Password" />
                 <span id="passwordError" class="error"></span>
-            </label>
             <button type="submit" class="btn">Login</button>
             {{#if error}}
-            <p class="error-msg">{{error}}</p>
+                <p class="error-msg">{{error}}</p>
             {{/if}}
         </form>
     </div>
+    
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"
         integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous">
         </script>

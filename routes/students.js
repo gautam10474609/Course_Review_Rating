@@ -12,17 +12,15 @@ router
   .get(async (req, res) => {
     res.clearCookie("AuthCookie");
     req.session.destroy();
-    res.status(200).render("login");
+    res.status(200).redirect("/");
     return;
   })
 router.get("/", async (req, res) => {
   try {
     const studentList = await students.getAllStudents();
     res.status(200).json(studentList);
-  } catch (e) {
-   res.status(404).render("error", { 
-     error: e
-     });
+  } catch (error) {
+   return res.status(404).render("error", {error: error});
   }
 });
 
@@ -40,21 +38,15 @@ router
     let email = req.body.email
     let password = req.body.password;
     try{
-      email = await validate.validateEmail(email, "Email");
+      email = await validate.validateEmail("Post Login", email, "Email");
       email = email.toLowerCase()
-    } catch (e) {
-      res.status(400).render("error", { 
-        error: e 
-      });
-      return;
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
     try{
-      password = await validate.validatePassword(password);
-    } catch (e) {
-      res.status(400).render("error", {
-         error: e 
-        });
-      return;
+      password = await validate.validatePassword("Post Login", password);
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
     try {
       const studentData = await students.checkStudent(xss(email),  xss(password));
@@ -68,10 +60,8 @@ router
            error: "Either the email or password is invalid" 
           });
       }
-    } catch (e) {
-      res.status(400).render("login", { 
-        error: e 
-      });
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
 });
 
@@ -82,9 +72,9 @@ router
     if (studentId) {
       res.status(200).redirect("/students/profile");
     } else {
-      let e = "Not Authorized"
+      let error = "Not Authorized"
       res.status(400).render("register", {
-        error:e
+        error:error
       });
     }
   }).post(async (req, res) => {
@@ -93,51 +83,35 @@ router
     let email = req.body.email
     let password = req.body.password;
     try{
-      firstName = await validate.validateName(firstName, "First Name" );
-    } catch (e) {
-      res.status(400).render("error", { 
-        error: e
-       });
-      return;
+      firstName = await validate.validateName("Post Register", firstName, "First Name" );
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
     try{
-      lastName = await validate.validateName(lastName, "Last Name" );
-    } catch (e) {
-      res.status(400).render("error", { 
-        error: e
-       });
-      return;
+      lastName = await validate.validateName("Post Register", lastName, "Last Name" );
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
     try{
-      email = await validate.validateEmail(email, "Email");
-    } catch (e) {
-      res.status(400).render("error", { 
-        error: e 
-      });
-      return;
+      email = await validate.validateEmail("Post Register", email, "Email");
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
     try{
-      password = await validate.validatePassword(password);
-    } catch (e) {
-      res.status(400).render("error", { 
-        error: e
-       });
-      return;
+      password = await validate.validatePassword("Post Register", password);
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
     try {
-    const studentData =  await students.addStudents(xss(firstName), xss(lastName), xss(email),  xss(password));
+    const studentData =  await students.createStudents(xss(firstName), xss(lastName), xss(email),  xss(password));
     if (studentData) res.status(200).redirect("/students/login");
     else {
-        res.status(500).render("register", {
+      return res.status(500).error("error", {
            error: "Internal Server Error"
            });
-        return;
       }
-    } catch (e) {
-      res.status(400).render("register", {
-         error: e
-         });
-      return;
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }       
     
   });
@@ -188,12 +162,9 @@ router.get("/:id", async (req, res) => {
   let studentId = req.session.AuthCookie
   let id = req.params.id;
     try{
-      id = await validate.validateId(id, "id");
-    } catch (e) {
-      res.status(400).render("error", { 
-        error: e 
-      });
-      return;
+      id = await validate.validateId("Get id", id, "id");
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
   if (studentId)
     studentLoggedIn = true;
@@ -214,10 +185,8 @@ router.get("/:id", async (req, res) => {
         reviews: reviewObj,
         studentLoggedIn: studentLoggedIn
       });
-    } catch (e) {
-      res.status(404).render("error", {
-         error: e 
-        });
+    } catch (error) {
+      return res.status(404).render("error", {error: error});
     }
 });
 

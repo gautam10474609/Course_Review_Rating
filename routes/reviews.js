@@ -2,238 +2,152 @@ const express = require("express");
 const router = express.Router();
 const data = require('../data/');
 const reviews = data.reviews;
-const students = data.students;
-const courses = data.courses;
-const comments = data.comments;
-const mongoCollections = require("../config/mongoCollections");
-const cour = mongoCollections.courses;
-const { ObjectId } = require('mongodb');
 const validate = require('../helper');
 
 router.get("/", async (req, res) => {
-    try {
-      return res.redirect("courses");
-    } catch (e) {
-     res.status(404).send();
-    }
-});
-
-router.get("/:id", async (req, res) => {
-  let isStudentReviewer = false;
-  let id = req.params.id;
-  let studentId = req.session.AuthCookie;
-  try{
-      id = await validate.validateId(id, "id");
-  } catch (e) {
-      res.status(400).render("error", { 
-        error: e 
-      });
-      return;
+  try {
+    return res.redirect("/courses");
+  } catch (error) {
+    return res.status(404).render("error", {error: error});
   }
-    try {
-      const review = await reviews.getReview(id);
-      const course = await courses.getCourse(review.courseId);
-      const student = await students.getStudents(review.studentId);
-      
-      if(studentId !== review.studentId) isStudentReviewer = false;
-      else isStudentReviewer = true;
-      res.status(200).render("review", { 
-        review: review, 
-        student: student, 
-        course: course, 
-        isStudentReviewer: isStudentReviewer, 
-        id: id 
-      });
-    } catch (e) {
-      res.status(404).render("error", {
-         error: e
-         });
-    }
+});
+router.get('/:id', async (req, res) => {
+  try {
+    return res.redirect("/");
+  } catch (error) {
+    return res.status(404).render("error", {error: error});
+  }
 });
 
 router.post("/:id/add", async (req, res) => {
   let id = req.params.id;
   let rating = Number(req.body.rating);
   let reviewText = req.body.reviewText;
-  let semesterVal =  req.body.selectSemester
+  let semesterVal = req.body.selectSemester
   let studentId = req.session.AuthCookie;
-    try{
-      id = await validate.validateId(id, "id");
-    } catch (e) {
-      res.status(400).render("error", {
-         error: e 
-        });
-      return;
-    }
-    try{
-      rating = validate.validateNumber(rating, "rating");
-    } catch (e) {
-      res.status(400).render("error", { 
-        error: e
-       });
-      return;
-    }
-    try{
-      semesterVal = validate.validateString(semesterVal, "semester");
-    } catch (e) {
-      res.status(400).render("error", { 
-        error: e
-       });
-      return;
-    }
-    try{
-      reviewText = await validate.validateString(reviewText, "reviewText");
-    } catch (e) {
-      res.status(400).render("error", { 
-        error: e 
-      });
-      return;
-    }
   try {
-    await reviews.addReview(id, studentId, semesterVal, reviewText, rating);
+    id = await validate.validateId("Post Add", id, "id");
+  } catch (error) {
+    return res.status(404).render("error", {error: error});
+  }
+  try {
+    rating = validate.validateNumber("Post Add", rating, "rating");
+  } catch (error) {
+    return res.status(400).render("error", {error: error});
+  }
+  try {
+    semesterVal = validate.validateString("Post Add", semesterVal, "semester");
+  } catch (error) {
+    return res.status(400).render("error", {error: error});
+  }
+  try {
+    reviewText = await validate.validateString("Post Add", reviewText, "reviewText");
+  } catch (error) {
+    return res.status(400).render("error", {error: error});
+  }
+  try {
+    await reviews.createReview(id, studentId, semesterVal, rating, reviewText,);
     return res.redirect("/courses/" + id);
-  } catch (e) {
-    res.status(404).render("error", { 
-      error: e
-     });
+  } catch (error) {
+    return res.status(404).render("error", {error: error});
   }
 });
 
-router.route("/:id/edit").get(async (req, res) => {
-  let id = req.params.id;
-  let rating = Number(req.body.rating);
-  let reviewText = req.body.reviewText;
-  let studentId = req.session.AuthCookie;
-    try{
-      id = await validate.validateId(id, "id");
-    } catch (e) {
-      res.status(400).render("error", {
-         error: e 
+router.route("/:id/edit")
+  .get(async (req, res) => {
+    let id = req.params.id;
+    let studentId = req.session.AuthCookie;
+    if (!studentId) studentLoggedIn = false;
+    else studentLoggedIn = true;
+    try {
+      id = await validate.validateId("Get Edit", id, "id");
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
+    }
+    try {
+      const review = await reviews.getReview(id);
+      let semesterVal= review.semesterVal;
+      if (studentId != review.studentId) {
+        return res.redirect("/reviews");
+      } else {
+        res.status(200).render("editReview", {
+          reviewId: id,
+          reviewData: review.reviewData,
+          rating: review.rating,
+          semesterVal: semesterVal,
+          studentLoggedIn: true
         });
-      return;
+      }
+    } catch (error) {
+      return res.status(404).render("error", {error: error});
     }
-    try{
-      rating = validate.validateNumber(rating, "rating");
-    } catch (e) {
-      res.status(400).render("error", {
-         error: e
-         });
-      return;
+  }).post(async (req, res) => {
+    let id = req.params.id
+    let rating = Number(req.body.rating);
+    let reviewData = req.body.reviewData;
+    let semesterVal = req.body.semesterVal;
+    let studentId = req.session.AuthCookie
+    try {
+      id = validate.validateId("Post Edit", id, "id");
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
-    try{
-      reviewText = await validate.validateString(reviewText, "reviewText");
-    } catch (e) {
-      res.status(400).render("error", {
-         error: e 
-        });
-      return;
+    try {
+      rating = validate.validateNumber("Post Edit", rating, "rating");
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
-  try {
-    const review = await reviews.getReview(id);
-    if (studentId != review.studentId) {
-      return res.redirect("/reviews");
-    } else {
-      res.status(200).render("editReview", {
-        reviewId: id, 
-        reviewText: review.reviewText, 
-        rating: review.rating, 
-        studentLoggedin: true
-      });
-    }} catch (e) {
-      res.status(404).render("error", { 
-        error: e 
+    if (rating > 5 || rating < 1) {
+      return res.status(400).render("error", {
+        error: "Post Edit: Rating should between 1 and 5"
       });
     }
-}).post(async (req, res) => {
-  const id = req.params.id
-  const rating = Number(req.body.rating);
-  const reviewText = req.body.reviewText;
-  let studentId= req.session.AuthCookie
-  try{
-    id = await validate.validateId(id, "id");
-  } catch (e) {
-    res.status(400).render("error", { 
-      error: e 
-    });
-    return;
-  }
-  try{
-    rating = validate.validateNumber(rating, "rating");
-  } catch (e) {
-    res.status(400).render("error", {
-       error: e 
-      });
-    return;
-  }
-  if (rating > 5 || rating < 1) {
-    return res.status(403).render("editReview", {
-      reviewId: req.params.id, 
-      reviewText: reviewText, 
-      rating: rating, 
-      studentLoggedin: true, 
-      isError: true, 
-      error: "Rating must be a number between 1 and 5"});
-  }
-  try{
-    reviewText = await validate.validateString(reviewText, "reviewText");
-  } catch (e) {
-    res.status(400).render("error", { 
-      error: e 
-    });
-    return;
-  }
-  
-  try {
-    const review = await reviews.getReview(id);
-    const student = await students.getStudents(review.studentId);
-    const course = await courses.getCourse(review.courseId);
-    const updatedReview = await reviews.updateReview(id, semesterVal, rating, reviewText);
-    if(studentId === review.studentId) {
-      isStudentReviewer = true;
+    try {
+      reviewData = validate.validateString("Post Edit", reviewData, "reviewData");
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
     }
-    return res.status(200).render("review", { 
-      review: updatedReview, 
-      student: student, 
-      course: course, 
-      isStudentReviewer: isStudentReviewer, 
-      id: id, 
-      studentLoggedin: true
-    });
-  } catch (e) {
-    res.status(404).render("error", { 
-      error: e 
-    });
-  }
-});
+    try {
+      const reviewInfo = await reviews.getReview(id);
+      await reviews.updateReview(id, semesterVal, rating, reviewData);
+      if (studentId === reviewInfo.studentId) {
+        isStudentReviewer = true;
+      }
+      return res.status(200).redirect("/courses");
+    } catch (error) {
+      return res.status(404).render("error", {error: error});
+    }
+  });
 
 router.get('/:courseId/:reviewId/delete', async (req, res) => {
-  if (!req.params.reviewId) {
-    res.status(400).render("error", {
-       error: e 
-      });
-    return;
+  let courseId = req.params.courseId
+  let reviewId = req.params.reviewId
+  try {
+      id = validate.validateId("Get Delete", courseId, "course Id");
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
+    }
+    try {
+      id = validate.validateId("Get Delete", reviewId, "review Id");
+    } catch (error) {
+      return res.status(400).render("error", {error: error});
+    }
+  try {
+    await reviews.getReview(reviewId);
+  } catch (error) {
+    return res.status(404).render("error", {error: error});
   }
   try {
-    await reviews.getReview(req.params.reviewId);
-  } catch (e) {
-    res.status(404).render("error", {
-       error: e 
-      });
-    return;
-  }
-  try {
-    deleteReviewWithComments = await reviews.removeReview(req.params.reviewId);
-    if(deleteReviewWithComments){
+    delRev = await reviews.removeReview(req.params.reviewId);
+    if (delRev) {
       return res.redirect("/courses/" + req.params.courseId);
     } else {
-      return res.status(404).render("error", { 
-        error: "not able to delete comments" 
+      return res.status(404).render("error", {
+        error: "not able to delete comments"
       });
     }
-  } catch (e) {
-    res.status(500).render("error", { 
-      error: e 
-    });
+  } catch (error) {
+    return res.status(400).render("error", {error: error});
   }
 });
 
